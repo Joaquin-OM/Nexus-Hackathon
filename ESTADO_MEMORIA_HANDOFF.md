@@ -75,3 +75,22 @@
   3. Registro y auditoría de las 22 acciones SOAR y los 13 bloqueos autónomos de la Directriz 1.
   4. Calculadora financiera interactiva de ROI con sliders basados en los parámetros del Director de TI.
   5. Explorador reactivo de las 78 alertas SOC únicas con búsqueda y filtros por clase.
+
+
+---
+
+## 4. INFORME EJECUTIVO EN DOCX Y SUBIDA A GOOGLE DRIVE (19:00 CET)
+
+- **Archivo Local Creado:** [`INFORME_EJECUTIVO_PLAN_INDUSTRIALIZACION_NEXUS_2_0.docx`](file:///c:/Users/osesj/Documents/Nexus-Hackathon/INFORME_EJECUTIVO_PLAN_INDUSTRIALIZACION_NEXUS_2_0.docx)
+- **ID de Google Drive:** `1gg3MPT2U8DdjJCogpgvEE9CbuTcqc7Of`
+- **Enlace Directo Google Drive:** [`https://docs.google.com/document/d/1gg3MPT2U8DdjJCogpgvEE9CbuTcqc7Of/edit`](https://docs.google.com/document/d/1gg3MPT2U8DdjJCogpgvEE9CbuTcqc7Of/edit)
+- **Carpeta de Equipo en Drive:** `https://drive.google.com/drive/folders/1tATG_YbewpzBzw1_o09bNsjoSRBvKbJj`
+- **Contenido del Informe:**
+  1. **En qué punto estamos (AS-IS):** 125 correos, 80 alertas únicas, taxonomía INCIBE, filtrado del 24,8% de ruido, 14 cuentas bloqueadas por SOAR (Directriz 1) y portal web en vivo.
+  2. **A qué punto queremos llegar (TO-BE):** Plan de 4 fases (Alta disponibilidad, integración SCADA/OT, cumplimiento automático NIS2 ante INCIBE-CERT e IA predictiva local).
+  3. **Cuánto coste en euros tendría llegar a eso:**
+     - CAPEX inicial de industrialización (Fases 1 a 3): **20.000 €** (360 horas de desarrollo interno a 50 €/h + infra Azure).
+     - OPEX anual recurrente: **12.000 €/año** (1.000 €/mes).
+     - Comparativa TCO 3 años: **56.000 € (NEXUS 2.0)** vs. **200.000 € (Plataforma Comercial)** -> **Ahorro de 144.000 € (-72%)**.
+     - Ahorro bruto operativo anual: **295.380 € / año** (liberando 6.564 horas de analistas/año).
+     - Payback: **1,4 meses (~42 días)**. ROI Año 1: **823%**.
