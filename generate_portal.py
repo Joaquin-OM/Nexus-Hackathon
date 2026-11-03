@@ -546,7 +546,7 @@ def main():
 
     function renderDrawerList() {{
       const c = document.getElementById('drawer-notifs-list');
-      const unack = NOTIFS_DATA.filter(n => !n.acknowledged && (n.priority === 'P1' || n.priority === 'P2'));
+      const unack = (NOTIFS_DATA || []).filter(n => !n.acknowledged && (n.priority === 'P1' || n.priority === 'P2'));
       if (!unack.length) {{
         c.innerHTML = '<p class="text-slate-400 text-center py-4">No hay avisos prioritarios pendientes.</p>';
         return;
@@ -577,7 +577,7 @@ def main():
       const q = (document.getElementById('notif-search').value || '').toLowerCase();
       const c = document.getElementById('notifs-container');
       
-      const filtered = NOTIFS_DATA.filter(n => {{
+      const filtered = (NOTIFS_DATA || []).filter(n => {{
         const matchF = CURRENT_NOTIF_FILTER === 'all' || 
                        (CURRENT_NOTIF_FILTER === 'unack' && !n.acknowledged) ||
                        (n.priority === CURRENT_NOTIF_FILTER);
@@ -706,7 +706,7 @@ def main():
       // Renderizar Alertas y SOAR
       const tbAlerts = document.getElementById('tbl-alerts');
       if (tbAlerts) {{
-        tbAlerts.innerHTML = ALERTS_DATA.slice(0, 100).map(a => `
+        tbAlerts.innerHTML = (ALERTS_DATA || []).slice(0, 100).map(a => `
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 font-mono text-cyan-400 font-bold">${{a.internal_id}}</td>
             <td class="p-2.5 text-slate-400 font-mono text-[10px]">${{a.timestamp.substring(0, 16)}}</td>
@@ -721,7 +721,7 @@ def main():
 
       const tbSoar = document.getElementById('tbl-soar-actions');
       if (tbSoar) {{
-        tbSoar.innerHTML = SOAR_DATA.slice(0, 50).map(s => `
+        tbSoar.innerHTML = (SOAR_DATA || []).slice(0, 50).map(s => `
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 font-mono text-purple-400 font-bold">#${{s.id}}</td>
             <td class="p-2.5 font-semibold text-white">${{s.action}}</td>
