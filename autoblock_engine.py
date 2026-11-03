@@ -22,8 +22,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
-from config import get_conn, SOAR_API_URL, SOAR_TEAM_PREFIX, SOAR_API_KEY
-from backend_api import call_sampol_soar_api
+from config import get_conn, SOAR_API_URL, SOAR_TEAM_PREFIX, SOAR_API_KEY, call_sampol_soar_api
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("autoblock_engine")
@@ -124,7 +123,7 @@ def execute_auto_release(conn, alert_id: int, internal_id: str, alert_code: str,
         "SELECT id, status FROM soar_actions WHERE idempotency_key = :ik",
         ik=ikey,
     )
-    if existing and existing[0][1] == "ejecutado":
+    if existing:
         return {"status": "idempotent_skip", "user": user_clean}
 
     full_reason = f"[ORDEN SOC · LIBERACIÓN] Liberación autorizada por Responsable de turno SOC ({internal_id} / {alert_code}) para '{user_clean}'. Motivo: {reason_detail}"

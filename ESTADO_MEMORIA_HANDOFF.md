@@ -60,3 +60,18 @@
 5. **Actualización de Documentación (`PLAN_MAESTRO_NEXUS_2_0_ACTUALIZADO.md`):**
    - Añadida la **Sección 9** detallando el cumplimiento de la Directriz 1 y 2, la justificación de contención y los resultados forenses.
    - Sincronizado con `PLAN_MAESTRO_NEXUS_EQUIPO1.md`.
+
+
+---
+
+## 3. PUBLICACIÓN EN GITHUB Y GITHUB PAGES (18:45 CET)
+
+- **Repositorio Público GitHub:** [`https://github.com/Joaquin-OM/Nexus-Hackathon`](https://github.com/Joaquin-OM/Nexus-Hackathon)
+- **Portal Web en Vivo (GitHub Pages):** [`https://joaquin-om.github.io/Nexus-Hackathon/`](https://joaquin-om.github.io/Nexus-Hackathon/)
+- **Protección de Seguridad:** `.gitignore` excluye estrictamente `.env`, `.graph_token.json`, credenciales de base de datos Azure y tokens OAuth.
+- **Capacidades del Portal Web:**
+  1. Gráficos dinámicos Chart.js con la distribución oficial INCIBE y severidades.
+  2. Cronología forense interactiva de la campaña multi-etapa `*moreno@sampol.com`.
+  3. Registro y auditoría de las 22 acciones SOAR y los 13 bloqueos autónomos de la Directriz 1.
+  4. Calculadora financiera interactiva de ROI con sliders basados en los parámetros del Director de TI.
+  5. Explorador reactivo de las 78 alertas SOC únicas con búsqueda y filtros por clase.

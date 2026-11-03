@@ -40,3 +40,28 @@ def get_conn():
     ssl_context.check_hostname = False
     ssl_context.verify_mode = ssl.CERT_NONE
     return pg8000.native.Connection(ssl_context=ssl_context, **DB_CONFIG)
+
+
+import urllib.request
+import urllib.error
+import json
+from typing import Optional, Tuple, Any
+
+def call_sampol_soar_api(endpoint_suffix: str, method: str = "GET", payload: Optional[dict] = None) -> Tuple[int, Any]:
+    url = f"{SOAR_API_URL}{SOAR_TEAM_PREFIX}{endpoint_suffix}"
+    headers = {"X-API-Key": SOAR_API_KEY, "Content-Type": "application/json"}
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            return resp.status, body
+    except urllib.error.HTTPError as e:
+        err_txt = e.read().decode("utf-8", errors="ignore")
+        try:
+            err_json = json.loads(err_txt)
+        except Exception:
+            err_json = {"error": err_txt}
+        return e.code, err_json
+    except Exception as e:
+        return 500, {"error": str(e)}
