@@ -1,56 +1,56 @@
 /* ==========================================================================
-   NEXUS SOC 2.0 — SISTEMA DE DISEÑO CORPORATIVO SAMPOL
-   Intelligent Security Operations · Plataforma Empresarial
+   NEXUS SOC 2.0 — PROFESSIONAL REFINED DESIGN SYSTEM (SAMPOL)
+   Minimalist, Sober, Enterprise-Grade Cybersecurity Platform
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* Paleta Corporativa Oficial SAMPOL */
   --sampol-blue: #0784B7;
   --sampol-blue-hover: #066d97;
-  --sampol-blue-light: #E8F4F9;
+  --sampol-blue-light: #F0F7FA;
   --sampol-green: #42A83B;
   --sampol-green-hover: #378c31;
-  --sampol-green-light: #EEF7ED;
+  --sampol-green-light: #F2F9F1;
   --sampol-dark: #172C3D;
   --sampol-slate: #243B50;
 
-  /* Superficies y Fondos Empresariales (Modo Claro Principal) */
-  --background: #F2F5F6;
+  /* Superficies y Fondos Minimalistas (Modo Claro Principal) */
+  --background: #F8FAFC;
   --surface: #FFFFFF;
-  --surface-secondary: #EAF0F3;
+  --surface-secondary: #F1F5F9;
   --surface-hover: #F8FAFC;
 
   /* Tipografía y Textos */
-  --text-primary: #172C3D;
-  --text-secondary: #647786;
-  --text-muted: #8FA2B0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
   --text-inverse: #FFFFFF;
 
-  /* Bordes y Separadores */
-  --border: #DCE4E9;
-  --border-subtle: #E8EEF2;
+  /* Bordes y Separadores Sutiles */
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
 
   /* Severidades de Seguridad (Independientes de la Marca SAMPOL) */
   --critical: #DC2626;
   --critical-bg: #FEF2F2;
-  --critical-border: #FCA5A5;
+  --critical-border: #FEE2E2;
   --critical-text: #991B1B;
 
   --high: #EA580C;
   --high-bg: #FFF7ED;
-  --high-border: #FDBA74;
+  --high-border: #FFEDD5;
   --high-text: #9A3412;
 
-  --medium: #D69E00;
-  --medium-bg: #FEFCE8;
-  --medium-border: #FDE047;
-  --medium-text: #854D0E;
+  --medium: #D97706;
+  --medium-bg: #FFFBEB;
+  --medium-border: #FEF3C7;
+  --medium-text: #92400E;
 
   --low: #16A34A;
   --low-bg: #F0FDF4;
-  --low-border: #86EFAC;
+  --low-border: #DCFCE7;
   --low-text: #166534;
 
   /* Estados de Sistema */
@@ -59,46 +59,44 @@
   --error: #DC2626;
   --info: #0284C7;
 
-  /* Sombras y Elevaciones */
-  --shadow-sm: 0 1px 2px 0 rgba(23, 44, 61, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(23, 44, 61, 0.07), 0 2px 4px -2px rgba(23, 44, 61, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(23, 44, 61, 0.08), 0 4px 6px -4px rgba(23, 44, 61, 0.04);
+  /* Sombras Mínimas */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* Modo Oscuro Alternativo (SOC Night-Shift) */
 .dark {
-  --background: #0B131B;
-  --surface: #121F2C;
-  --surface-secondary: #182A3A;
-  --surface-hover: #1E3347;
+  --background: #0B1118;
+  --surface: #111A24;
+  --surface-secondary: #172331;
+  --surface-hover: #1C2B3C;
 
-  --text-primary: #F1F5F9;
+  --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
-  --text-inverse: #0B131B;
+  --text-inverse: #0B1118;
 
-  --border: #22374A;
-  --border-subtle: #1C2D3D;
+  --border: #1E293B;
+  --border-subtle: #172331;
 
-  --critical-bg: rgba(220, 38, 38, 0.15);
-  --critical-border: rgba(220, 38, 38, 0.35);
+  --critical-bg: rgba(220, 38, 38, 0.12);
+  --critical-border: rgba(220, 38, 38, 0.25);
   --critical-text: #FCA5A5;
 
-  --high-bg: rgba(234, 88, 12, 0.15);
-  --high-border: rgba(234, 88, 12, 0.35);
+  --high-bg: rgba(234, 88, 12, 0.12);
+  --high-border: rgba(234, 88, 12, 0.25);
   --high-text: #FDBA74;
 
-  --medium-bg: rgba(214, 158, 0, 0.15);
-  --medium-border: rgba(214, 158, 0, 0.35);
-  --medium-text: #FDE047;
+  --medium-bg: rgba(217, 119, 6, 0.12);
+  --medium-border: rgba(217, 119, 6, 0.25);
+  --medium-text: #FDE68A;
 
-  --low-bg: rgba(22, 163, 74, 0.15);
-  --low-border: rgba(22, 163, 74, 0.35);
+  --low-bg: rgba(22, 163, 74, 0.12);
+  --low-border: rgba(22, 163, 74, 0.25);
   --low-text: #86EFAC;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
 }
 
 /* Base */
@@ -107,7 +105,7 @@ body {
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: -0.011em;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 code, pre, .font-mono {
@@ -116,8 +114,8 @@ code, pre, .font-mono {
 
 /* Scrollbar sutil corporativo */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -130,47 +128,60 @@ code, pre, .font-mono {
   background: var(--text-muted);
 }
 
-/* Tarjeta Corporativa SAMPOL */
+/* Tarjeta Corporativa Minimalista */
 .sampol-card {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.15s ease;
 }
-.sampol-card:hover {
-  box-shadow: var(--shadow-md);
+
+/* Iconos Lucide Uniformes */
+.lucide, i[data-lucide] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  stroke-width: 1.75px;
+  flex-shrink: 0;
 }
 
 /* Botones */
 .btn-sampol-primary {
   background-color: var(--sampol-blue);
   color: #FFFFFF;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 .btn-sampol-primary:hover {
   background-color: var(--sampol-blue-hover);
-  box-shadow: 0 2px 8px rgba(7, 132, 183, 0.35);
 }
 
 .btn-sampol-secondary {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  font-size: 0.8125rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 6px;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
 }
 .btn-sampol-secondary:hover {
   background-color: var(--surface-secondary);
+  color: var(--text-primary);
   border-color: var(--text-muted);
 }
 
@@ -178,75 +189,88 @@ code, pre, .font-mono {
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   cursor: pointer;
+  border-left: 2px solid transparent;
 }
 .sidebar-nav-item:hover {
   background-color: var(--surface-secondary);
-  color: var(--sampol-blue);
+  color: var(--text-primary);
 }
 .sidebar-nav-item.active {
   background-color: var(--sampol-blue-light);
   color: var(--sampol-blue);
-  font-weight: 700;
-  border-left: 3px solid var(--sampol-blue);
+  font-weight: 600;
+  border-left-color: var(--sampol-blue);
 }
 .dark .sidebar-nav-item.active {
-  background-color: rgba(7, 132, 183, 0.2);
+  background-color: rgba(7, 132, 183, 0.15);
   color: #38BDF8;
-  border-left: 3px solid #38BDF8;
+  border-left-color: #38BDF8;
 }
 
-/* Badges de Severidad */
+/* Badges de Severidad y Estado */
 .badge-critical {
   background-color: var(--critical-bg);
   color: var(--critical-text);
   border: 1px solid var(--critical-border);
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
 }
 .badge-high {
   background-color: var(--high-bg);
   color: var(--high-text);
   border: 1px solid var(--high-border);
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
 }
 .badge-medium {
   background-color: var(--medium-bg);
   color: var(--medium-text);
   border: 1px solid var(--medium-border);
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
 }
 .badge-low {
   background-color: var(--low-bg);
   color: var(--low-text);
   border: 1px solid var(--low-border);
   font-weight: 500;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
 }
 
 /* Tablas Corporativas */
 .sampol-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
 }
 .sampol-table th {
   background-color: var(--surface-secondary);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.875rem;
   border-bottom: 1px solid var(--border);
+  text-align: left;
 }
 .sampol-table td {
-  padding: 0.875rem 1rem;
+  padding: 0.6875rem 0.875rem;
   border-bottom: 1px solid var(--border-subtle);
   font-size: 0.8125rem;
 }
