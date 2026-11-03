@@ -1,0 +1,17 @@
+# Credenciales y Secretos
+.env
+.env.local
+.graph_token.json
+
+# Entornos virtuales y dependencias
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Archivos pesados y volcados temporales
+mailbox_dump.json
+drive-download*
+*.zip
+*.log
+evidence/
