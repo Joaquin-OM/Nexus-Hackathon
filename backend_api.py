@@ -14,12 +14,15 @@ from ingest_and_classify import (
     normalize_ip,
     main as run_graph_ingest,
 )
+from notifications.router import router as smart_notifications_router
 
 app = FastAPI(
     title="NEXUS 2.0 — SOC API (Equipo 1)",
     description="API interna para ingesta, clasificación INCIBE, auditoría, investigación forense y orquestación SOAR supervisada.",
     version="2.0.0",
 )
+
+app.include_router(smart_notifications_router)
 
 app.add_middleware(
     CORSMiddleware,

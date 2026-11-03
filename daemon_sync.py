@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 from config import get_conn
 from ingest_and_classify import main as run_ingest
+from sync_alerts_to_notifications import sync_existing_alerts
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,7 +30,8 @@ def run_daemon_loop(poll_interval: int = 45):
         try:
             logger.info(f"[CICLO #{iteration}] Comprobando buzón Microsoft Graph...")
             run_ingest()
-            logger.info(f"[CICLO #{iteration}] Ingesta y barrido de contención finalizados con éxito.")
+            sync_existing_alerts()
+            logger.info(f"[CICLO #{iteration}] Ingesta, barrido de contención y Smart Notifications sincronizados con éxito.")
         except Exception as e:
             logger.error(f"[CICLO #{iteration}] Error durante el ciclo de sincronización: {e}", exc_info=True)
 
