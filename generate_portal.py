@@ -163,7 +163,7 @@ def main():
   <!-- =========================================================================
        ÁREA DE CONTENIDO
        ========================================================================= -->
-  <div class="flex-1 md:pl-64 flex flex-col min-h-screen">
+  <div class="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full max-w-full overflow-x-clip">
     
     <!-- HEADER SUPERIOR -->
     <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#111A24]/95 backdrop-blur-sm border-b border-[#E2E8F0] dark:border-[#1E293B] px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
@@ -243,12 +243,12 @@ def main():
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
+    <main class="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl w-full mx-auto space-y-6 min-w-0">
 
       <!-- =====================================================================
            TAB 1: DASHBOARD
            ===================================================================== -->
-      <section id="tab-resumen" class="tab-content space-y-5">
+      <section id="tab-resumen" class="tab-content space-y-5 min-w-0 w-full">
         
         <!-- ENCABEZADO -->
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -352,7 +352,7 @@ def main():
       <!-- =====================================================================
            TAB 2: ALERTAS
            ===================================================================== -->
-      <section id="tab-dataset" class="tab-content hidden space-y-4">
+      <section id="tab-dataset" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -364,9 +364,10 @@ def main():
           </div>
         </div>
 
-        <div class="sampol-card overflow-hidden">
-          <div class="overflow-x-auto max-h-[580px]">
-            <table class="sampol-table">
+        <div class="sampol-card overflow-hidden min-w-0 w-full">
+          <!-- VISTA ESCRITORIO Y TABLET: TABLA CON SCROLL INTERNO -->
+          <div class="hidden md:block overflow-x-auto max-h-[580px] min-w-0 w-full">
+            <table class="sampol-table min-w-full">
               <thead class="sticky top-0 z-10">
                 <tr>
                   <th>Código</th>
@@ -383,6 +384,11 @@ def main():
               </tbody>
             </table>
           </div>
+
+          <!-- VISTA MÓVIL: TARJETAS VERTICALES ADAPTATIVAS (0 DESBORDAMIENTO) -->
+          <div id="cards-alerts" class="block md:hidden p-3 space-y-2.5 max-h-[580px] overflow-y-auto min-w-0">
+            <!-- Inyección JS para móvil -->
+          </div>
         </div>
 
       </section>
@@ -390,7 +396,7 @@ def main():
       <!-- =====================================================================
            TAB 3: NOTIFICACIONES
            ===================================================================== -->
-      <section id="tab-notifications" class="tab-content hidden space-y-4">
+      <section id="tab-notifications" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -473,7 +479,7 @@ def main():
       <!-- =====================================================================
            TAB 4: INVESTIGACIÓN
            ===================================================================== -->
-      <section id="tab-forense" class="tab-content hidden space-y-4">
+      <section id="tab-forense" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Investigación</h1>
@@ -484,32 +490,33 @@ def main():
         <div class="sampol-card p-4 space-y-2.5 text-xs">
           <div class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Cronología del Incidente (MITRE ATT&CK)</div>
           
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
             <span><strong>1. Phishing:</strong> AL-20261030-0025 recibido en buzón de jmoreno@sampol.com.</span>
             <span class="font-mono text-[10px] text-slate-400">02:41 UTC</span>
           </div>
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
             <span><strong>2. Password Spray:</strong> AL-20261030-0026 detecta 43 autenticaciones anómalas.</span>
             <span class="font-mono text-[10px] text-slate-400">02:54 UTC</span>
           </div>
-          <div class="p-2.5 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 flex justify-between items-center">
+          <div class="p-2.5 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
             <span class="text-rose-700 dark:text-rose-300"><strong>3. Paciente Cero:</strong> Emisión ilegítima de token para jmoreno@sampol.com.</span>
             <span class="font-mono text-[10px] text-rose-600 font-bold">03:20 UTC</span>
           </div>
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
             <span><strong>4. Exfiltración:</strong> Lectura y modificación de ficheros en srv-barcelona-201.</span>
             <span class="font-mono text-[10px] text-slate-400">03:33 UTC</span>
           </div>
-          <div class="p-2.5 rounded border border-rose-300 dark:border-rose-800 bg-rose-100/40 dark:bg-rose-950/40 flex justify-between items-center">
+          <div class="p-2.5 rounded border border-rose-300 dark:border-rose-800 bg-rose-100/40 dark:bg-rose-950/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
             <span class="text-rose-800 dark:text-rose-200"><strong>5. Canal C2:</strong> Balizamiento hacia sync-gateway.invalid (Precursor Ransomware).</span>
             <span class="font-mono text-[10px] text-rose-700 font-bold">03:46 UTC</span>
           </div>
         </div>
 
         <!-- IOCS -->
-        <div class="sampol-card p-4">
+        <div class="sampol-card p-4 min-w-0 w-full overflow-hidden">
           <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs mb-3">Indicadores de Compromiso (IoCs)</div>
-          <table class="sampol-table">
+          <div class="overflow-x-auto min-w-0 w-full">
+            <table class="sampol-table min-w-full">
             <thead>
               <tr>
                 <th>Tipo</th>
@@ -545,6 +552,7 @@ def main():
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
       </section>
@@ -552,7 +560,7 @@ def main():
       <!-- =====================================================================
            TAB 5: RESPUESTA (SOAR)
            ===================================================================== -->
-      <section id="tab-soar" class="tab-content hidden space-y-4">
+      <section id="tab-soar" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -564,9 +572,10 @@ def main():
           </span>
         </div>
 
-        <div class="sampol-card overflow-hidden">
-          <div class="overflow-x-auto max-h-[500px]">
-            <table class="sampol-table">
+        <div class="sampol-card overflow-hidden min-w-0 w-full">
+          <!-- VISTA ESCRITORIO Y TABLET: TABLA CON SCROLL INTERNO -->
+          <div class="hidden md:block overflow-x-auto max-h-[500px] min-w-0 w-full">
+            <table class="sampol-table min-w-full">
               <thead class="sticky top-0 z-10">
                 <tr>
                   <th>ID</th>
@@ -582,6 +591,11 @@ def main():
               </tbody>
             </table>
           </div>
+
+          <!-- VISTA MÓVIL: TARJETAS VERTICALES ADAPTATIVAS (0 DESBORDAMIENTO) -->
+          <div id="cards-soar" class="block md:hidden p-3 space-y-2.5 max-h-[500px] overflow-y-auto min-w-0">
+            <!-- Inyección JS para móvil -->
+          </div>
         </div>
 
       </section>
@@ -589,7 +603,7 @@ def main():
       <!-- =====================================================================
            TAB 6: ACTIVOS
            ===================================================================== -->
-      <section id="tab-activos" class="tab-content hidden space-y-4">
+      <section id="tab-activos" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Activos</h1>
@@ -653,7 +667,7 @@ def main():
       <!-- =====================================================================
            TAB 7: AUTOMATIZACIÓN
            ===================================================================== -->
-      <section id="tab-automations" class="tab-content hidden space-y-4">
+      <section id="tab-automations" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Automatización</h1>
@@ -694,7 +708,7 @@ def main():
       <!-- =====================================================================
            TAB 8: FINANZAS (CALCULADORA ROI)
            ===================================================================== -->
-      <section id="tab-roi" class="tab-content hidden space-y-4">
+      <section id="tab-roi" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finanzas</h1>
@@ -785,7 +799,7 @@ def main():
       <!-- =====================================================================
            TAB 9: DIRECTRICES
            ===================================================================== -->
-      <section id="tab-directrices" class="tab-content hidden space-y-4">
+      <section id="tab-directrices" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Directrices</h1>
@@ -835,7 +849,7 @@ def main():
       <!-- =====================================================================
            TAB 10: AUDITORÍA
            ===================================================================== -->
-      <section id="tab-auditoria" class="tab-content hidden space-y-4">
+      <section id="tab-auditoria" class="tab-content hidden space-y-4 min-w-0 w-full">
         
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Auditoría</h1>
