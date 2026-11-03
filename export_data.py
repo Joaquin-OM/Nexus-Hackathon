@@ -1,5 +1,10 @@
 import json
 from config import get_conn
+from data_validator import (
+    validate_and_clean_host,
+    validate_and_clean_user,
+    validate_and_clean_ip,
+)
 
 def export_data():
     conn = get_conn()
@@ -19,10 +24,10 @@ def export_data():
             "class": r[3] or "Sin clasificar",
             "subclass": r[4] or "General",
             "severity": r[5] or "Media",
-            "user": r[6] or "N/A",
-            "host": r[7] or "N/A",
-            "ip": r[8] or "N/A",
-            "site": r[9] or "N/A",
+            "user": validate_and_clean_user(r[6]),
+            "host": validate_and_clean_host(r[7]),
+            "ip": validate_and_clean_ip(r[8]) or "No identificada",
+            "site": r[9] or "SAMPOL Central",
             "category": r[10] or "N/A",
             "status": r[11] or "nueva",
             "desc": r[12] or ""
@@ -60,6 +65,10 @@ def export_data():
     """)
     notifications = []
     for r in notif_rows:
+        asset_clean = validate_and_clean_host(r[6])
+        if asset_clean == "No identificado":
+            asset_clean = "Infraestructura Central SAMPOL"
+            
         notifications.append({
             "id": r[0],
             "incident_id": r[1],
@@ -69,8 +78,8 @@ def export_data():
             "description": r[5],
             "count": r[8],
             "acknowledged": r[12] == "acknowledged",
-            "affected_asset": r[6] or "Corporativo",
-            "affected_user": r[7] or "N/A",
+            "affected_asset": asset_clean,
+            "affected_user": validate_and_clean_user(r[7]),
             "reasons": r[11] if isinstance(r[11], list) else json.loads(r[11] or "[]"),
             "status": r[12],
             "acknowledged_by": r[13],

@@ -7,6 +7,7 @@ import urllib.parse
 from datetime import datetime, timezone
 from html import unescape
 from config import get_conn
+from data_validator import validate_and_clean_host, validate_and_clean_user, validate_and_clean_ip
 
 TOKEN_FILE = r"C:\Users\osesj\Documents\Nexus-Hackathon\.graph_token.json"
 DUMP_FILE = r"C:\Users\osesj\Documents\Nexus-Hackathon\mailbox_dump.json"
@@ -604,14 +605,16 @@ def main():
         if not event_utc:
             event_utc = received_utc
 
-        cuenta = tfields.get("cuenta relacionada", "No identificado")
-        if cuenta.lower().startswith("no identificad") or cuenta.lower() == "no aplica":
-            cuenta = None
-        recurso = tfields.get("recurso", "No indicado")
-        if recurso.lower() in ("no aplica", "no indicada"):
-            recurso = None
+        raw_cuenta = tfields.get("cuenta relacionada", "")
+        clean_cuenta = validate_and_clean_user(raw_cuenta)
+        cuenta = clean_cuenta if clean_cuenta != "No identificado" else None
+
+        raw_recurso = tfields.get("recurso", "")
+        clean_recurso = validate_and_clean_host(raw_recurso)
+        recurso = clean_recurso if clean_recurso != "No identificado" else None
+
         raw_ip = tfields.get("direccion relacionada", "")
-        clean_ip = normalize_ip(raw_ip, body_text)
+        clean_ip = validate_and_clean_ip(raw_ip) or normalize_ip(raw_ip, body_text)
         sede = tfields.get("sede", "No indicada")
         criticidad_activo = tfields.get("criticidad", "Media")
         fuente = tfields.get("fuente", "SOC")

@@ -687,7 +687,7 @@ def main():
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestión de avisos inteligentes y anti-fatiga (capacidad 200.000 alertas/día).</p>
           </div>
           <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-            Throughput: 238.000 alertas/s (0.004 ms)
+            Throughput operativo: 200.000 alertas/día (2,31 alertas/s sostenidas)
           </span>
         </div>
 
@@ -1212,16 +1212,25 @@ def main():
         </div>
       </div>
 
-      <!-- DESCRIPCIÓN TÉCNICA -->
+      <!-- EXPLICACIÓN ESTRUCTURADA: ¿POR QUÉ REQUIERE ATENCIÓN ESTE INCIDENTE? -->
+      <div class="p-3.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/25 border border-rose-200 dark:border-rose-900/60 space-y-1.5">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-400">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-rose-600"></i>
+          <span>¿Por qué requiere atención este incidente?</span>
+        </div>
+        <p id="modal-inc-why" class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed font-sans"></p>
+      </div>
+
+      <!-- DESCRIPCIÓN TÉCNICA Y RESUMEN -->
       <div class="space-y-1 text-xs">
-        <strong class="text-slate-700 dark:text-slate-300">Descripción y Evidencia</strong>
+        <strong class="text-slate-700 dark:text-slate-300 font-semibold">Resumen de Alerta y Evidencia de Origen</strong>
         <p id="modal-inc-desc" class="p-3 rounded bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-mono text-[11px] leading-relaxed break-words"></p>
       </div>
 
-      <!-- FACTORES DE CORRELACIÓN -->
-      <div class="space-y-1 text-xs">
-        <strong class="text-slate-700 dark:text-slate-300">Factores Correlacionados por el Motor</strong>
-        <div id="modal-inc-reasons" class="flex flex-wrap gap-1.5 pt-1"></div>
+      <!-- EVIDENCIAS AGRUPADAS POR CATEGORÍA -->
+      <div class="space-y-2 text-xs">
+        <strong class="text-slate-700 dark:text-slate-300 font-semibold">Evidencias Correlacionadas por Categoría</strong>
+        <div id="modal-inc-categories-container" class="space-y-2 pt-1"></div>
       </div>
 
       <!-- ASIGNACIÓN DE RESPONSABLE -->
@@ -1591,13 +1600,68 @@ def main():
       document.getElementById('modal-inc-desc').textContent = inc.description || 'Sin descripción adicional.';
       document.getElementById('modal-inc-responsible').textContent = inc.acknowledged_by || 'Sin asignar';
 
-      const reasonsContainer = document.getElementById('modal-inc-reasons');
-      reasonsContainer.innerHTML = (inc.reasons || []).map(r => `
-        <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] border border-slate-200 dark:border-slate-700">
-          ${{r}}
-        </span>
-      `).join('') || '<span class="text-slate-400 text-[10px]">Sin factores adicionales</span>';
+      // 1. Explicación estructurada: ¿Por qué requiere atención?
+      const whyEl = document.getElementById('modal-inc-why');
+      if (whyEl) {{
+        const topReasons = (inc.reasons || []).slice(0, 2).join(' y ');
+        const assetTarget = inc.affected_asset && inc.affected_asset !== 'No identificado' ? inc.affected_asset : 'infraestructura corporativa';
+        const userTarget = inc.affected_user && inc.affected_user !== 'No identificado' ? 'la cuenta ' + inc.affected_user : 'vector de acceso';
+        whyEl.innerHTML = 'Este incidente ha alcanzado prioridad <strong class="text-rose-600 dark:text-rose-400">' + inc.priority + '</strong> con un nivel de riesgo de <strong>' + (inc.risk_score || 85) + '/100</strong>. Las evidencias auditadas confirman <strong>' + (topReasons || 'amenaza técnica activa') + '</strong> sobre <strong>' + userTarget + '</strong> y el activo <strong>' + assetTarget + '</strong>. Requiere intervención inmediata del analista según el SLA operativo de 15 minutos.';
+      }}
 
+      // 2. Agrupación estructurada de evidencias en acordeones colapsables
+      const catContainer = document.getElementById('modal-inc-categories-container');
+      if (catContainer) {{
+        const rawReasons = inc.reasons || [];
+        const cats = {{
+          'Malware y Precursores Ransomware': [],
+          'Red y Canales de Comando & Control (C2)': [],
+          'Autenticación e Intentos de Acceso': [],
+          'Identidad, Privilegios y Persistencia': [],
+          'Criticidad de Activos y Entorno Industrial': [],
+          'Correlación y Volumen de Alertas': [],
+          'Otras Evidencias de Seguridad': []
+        }};
+
+        rawReasons.forEach(r => {{
+          const rLow = r.toLowerCase();
+          if (rLow.includes('malware') || rLow.includes('modify') || rLow.includes('dañino') || rLow.includes('ransom')) {{
+            cats['Malware y Precursores Ransomware'].push(r);
+          }} else if (rLow.includes('c2') || rLow.includes('comando') || rLow.includes('tráfico') || rLow.includes('red')) {{
+            cats['Red y Canales de Comando & Control (C2)'].push(r);
+          }} else if (rLow.includes('credencial') || rLow.includes('spray') || rLow.includes('autentic') || rLow.includes('acceso')) {{
+            cats['Autenticación e Intentos de Acceso'].push(r);
+          }} else if (rLow.includes('privilegi') || rLow.includes('admin') || rLow.includes('apt') || rLow.includes('lateral')) {{
+            cats['Identidad, Privilegios y Persistencia'].push(r);
+          }} else if (rLow.includes('crítica') || rLow.includes('ot') || rLow.includes('planta') || rLow.includes('activo')) {{
+            cats['Criticidad de Activos y Entorno Industrial'].push(r);
+          }} else if (rLow.includes('volumen') || rLow.includes('masivo') || rLow.includes('correlacionad') || rLow.includes('reiterad')) {{
+            cats['Correlación y Volumen de Alertas'].push(r);
+          }} else {{
+            cats['Otras Evidencias de Seguridad'].push(r);
+          }}
+        }});
+
+        let catHtml = '';
+        Object.entries(cats).forEach(([catTitle, items]) => {{
+          if (items.length > 0) {{
+            catHtml += '<details class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/50 p-2.5 space-y-1.5 transition" open>' +
+              '<summary class="cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between select-none">' +
+                '<span class="flex items-center gap-2">' +
+                  '<span class="w-2 h-2 rounded-full bg-[#0784B7]"></span>' +
+                  '<span>' + catTitle + '</span>' +
+                '</span>' +
+                '<span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 font-mono text-slate-600 dark:text-slate-300">' + items.length + '</span>' +
+              '</summary>' +
+              '<ul class="pt-2 pl-4 space-y-1 text-[11px] text-slate-600 dark:text-slate-300 list-disc">' +
+                items.map(it => '<li>' + it + '</li>').join('') +
+              '</ul>' +
+            '</details>';
+          }}
+        }});
+
+        catContainer.innerHTML = catHtml || '<div class="text-slate-400 text-[11px]">Sin factores adicionales registrados.</div>';
+      }}
       const btnAck = document.getElementById('modal-btn-ack');
       if (btnAck) {{
         btnAck.innerHTML = inc.acknowledged

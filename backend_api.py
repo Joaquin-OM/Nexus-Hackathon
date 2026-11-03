@@ -4,7 +4,7 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from config import get_conn, SOAR_API_URL, SOAR_API_KEY, SOAR_TEAM_PREFIX
@@ -13,6 +13,15 @@ from ingest_and_classify import (
     detect_prompt_injection,
     normalize_ip,
     main as run_graph_ingest,
+)
+import os
+from security import (
+    AuthenticatedUser,
+    UserRole,
+    Permission,
+    get_current_user,
+    require_permission,
+    require_role,
 )
 from notifications.router import router as smart_notifications_router
 
@@ -24,11 +33,28 @@ app = FastAPI(
 
 app.include_router(smart_notifications_router)
 
+ALLOWED_ORIGINS = [
+    "http://localhost:8501",
+    "http://127.0.0.1:8501",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://joaquin-om.github.io",
+]
+extra_origins = os.environ.get("CORS_ALLOWED_ORIGINS")
+if extra_origins:
+    for o in extra_origins.split(","):
+        o_clean = o.strip()
+        if o_clean and o_clean not in ALLOWED_ORIGINS:
+            ALLOWED_ORIGINS.append(o_clean)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-NEXUS-KEY", "X-User-Id", "X-Requested-With", "Accept"],
 )
 
 # ============================================================================
@@ -420,7 +446,7 @@ def get_alert_detail(alert_id: int):
     }
 
 @app.patch("/alerts/{alert_id}")
-def patch_alert(alert_id: int, req: AlertPatchRequest):
+def patch_alert(alert_id: int, req: AlertPatchRequest, current_user: AuthenticatedUser = Depends(require_permission(Permission.PATCH_ALERTS))):
     conn = get_conn()
     curr = conn.run(
         "SELECT incibe_class, incibe_type, normalized_severity, status, classification_justification FROM alerts WHERE id = :aid",
@@ -443,26 +469,26 @@ def patch_alert(alert_id: int, req: AlertPatchRequest):
                status = :st, classification_justification = :just,
                classified_by = :cby, reviewed_by_human = TRUE, updated_at = NOW()
            WHERE id = :aid""",
-        cls=new_cls, typ=new_typ, sev=new_sev, st=new_st, just=new_just, cby=req.changed_by, aid=alert_id,
+        cls=new_cls, typ=new_typ, sev=new_sev, st=new_st, just=new_just, cby=current_user.email, aid=alert_id,
     )
 
     if new_cls != old_cls or new_typ != old_typ:
         conn.run(
             """INSERT INTO alert_audit_log (alert_id, changed_by, action_type, field_changed, old_value, new_value, reason)
                VALUES (:aid, :cby, 'CAMBIO_CATEGORIA', 'incibe_class', :oldv, :newv, :rsn)""",
-            aid=alert_id, cby=req.changed_by, oldv=f"{old_cls} / {old_typ}", newv=f"{new_cls} / {new_typ}", rsn=req.reason,
+            aid=alert_id, cby=current_user.email, oldv=f"{old_cls} / {old_typ}", newv=f"{new_cls} / {new_typ}", rsn=req.reason,
         )
     if new_st != old_st:
         conn.run(
             """INSERT INTO alert_audit_log (alert_id, changed_by, action_type, field_changed, old_value, new_value, reason)
                VALUES (:aid, :cby, 'CAMBIO_ESTADO', 'status', :oldv, :newv, :rsn)""",
-            aid=alert_id, cby=req.changed_by, oldv=old_st, newv=new_st, rsn=req.reason,
+            aid=alert_id, cby=current_user.email, oldv=old_st, newv=new_st, rsn=req.reason,
         )
     conn.close()
     return {"status": "updated", "alert_id": alert_id}
 
 @app.post("/soar/request")
-def soar_request(req: SoarRequestPayload):
+def soar_request(req: SoarRequestPayload, current_user: AuthenticatedUser = Depends(require_permission(Permission.REQUEST_SOAR))):
     conn = get_conn()
     # Verificar Whitelist IT/OT
     wl = conn.run(
@@ -486,7 +512,7 @@ def soar_request(req: SoarRequestPayload):
         res = conn.run(
             """INSERT INTO soar_actions (alert_id, action, target_type, target_value, trigger_mode, status, requested_by, idempotency_key, reason)
                VALUES (:aid, 'bloquear', :ttype, :tval, 'solicitud_supervisada', 'pendiente_aprobacion', :rby, :ik, :rsn) RETURNING id""",
-            aid=req.alert_id, ttype=req.target_type, tval=req.target_value.strip(), rby=req.requested_by, ik=ikey, rsn=req.reason,
+            aid=req.alert_id, ttype=req.target_type, tval=req.target_value.strip(), rby=current_user.email, ik=ikey, rsn=req.reason,
         )
         conn.close()
         return {"status": "pendiente_aprobacion", "soar_action_id": res[0][0], "idempotency_key": ikey}
@@ -503,7 +529,7 @@ def soar_request(req: SoarRequestPayload):
     )
 
 @app.post("/soar/approve")
-def soar_approve(req: SoarApprovePayload):
+def soar_approve(req: SoarApprovePayload, current_user: AuthenticatedUser = Depends(require_permission(Permission.APPROVE_SOAR))):
     conn = get_conn()
     if req.soar_action_id:
         row = conn.run("SELECT target_type, target_value, alert_id, reason FROM soar_actions WHERE id = :id", id=req.soar_action_id)
@@ -540,14 +566,14 @@ def soar_approve(req: SoarApprovePayload):
                SET status = 'ejecutado', approved_by = :aby, external_block_id = :eid,
                    api_status_code = :code, api_response = :resp, executed_at = NOW()
                WHERE id = :id""",
-            aby=req.approved_by, eid=ext_id, code=http_code, resp=json.dumps(api_resp), id=req.soar_action_id,
+            aby=current_user.email, eid=ext_id, code=http_code, resp=json.dumps(api_resp), id=req.soar_action_id,
         )
         action_id = req.soar_action_id
     else:
         res = conn.run(
             """INSERT INTO soar_actions (external_block_id, alert_id, action, target_type, target_value, trigger_mode, status, requested_by, approved_by, idempotency_key, api_status_code, api_response, reason, executed_by)
                VALUES (:eid, :aid, 'bloquear', :ttype, :tval, 'aprobado_humano', 'ejecutado', :aby, :aby, :ik, :code, :resp, :rsn, :aby) RETURNING id""",
-            eid=ext_id, aid=aid, ttype=ttype, tval=tval, aby=req.approved_by, ik=ikey, code=http_code, resp=json.dumps(api_resp), rsn=rsn,
+            eid=ext_id, aid=aid, ttype=ttype, tval=tval, aby=current_user.email, ik=ikey, code=http_code, resp=json.dumps(api_resp), rsn=rsn,
         )
         action_id = res[0][0]
 
@@ -555,13 +581,13 @@ def soar_approve(req: SoarApprovePayload):
         conn.run(
             """INSERT INTO alert_audit_log (alert_id, changed_by, action_type, field_changed, old_value, new_value, reason)
                VALUES (:aid, :aby, 'ACCION_SOAR', :ttype, 'activo', :nval, :rsn)""",
-            aid=aid, aby=req.approved_by, ttype=ttype, nval=f"BLOQUEADO: {tval} (HTTP {http_code})", rsn=rsn,
+            aid=aid, aby=current_user.email, ttype=ttype, nval=f"BLOQUEADO: {tval} (HTTP {http_code})", rsn=rsn,
         )
     conn.close()
     return {"status": "ejecutado", "soar_action_id": action_id, "http_code": http_code, "api_response": api_resp}
 
 @app.post("/soar/release")
-def soar_release(req: SoarReleasePayload):
+def soar_release(req: SoarReleasePayload, current_user: AuthenticatedUser = Depends(require_permission(Permission.RELEASE_SOAR))):
     conn = get_conn()
     ttype = req.target_type
     tval = req.target_value.strip()
@@ -573,13 +599,13 @@ def soar_release(req: SoarReleasePayload):
     res = conn.run(
         """INSERT INTO soar_actions (external_block_id, alert_id, action, target_type, target_value, trigger_mode, status, requested_by, approved_by, idempotency_key, api_status_code, api_response, reason, executed_by)
            VALUES (:eid, :aid, 'liberar', :ttype, :tval, 'liberacion_controlada', 'liberado', :eby, :eby, :ik, :code, :resp, :rsn, :eby) RETURNING id""",
-        eid=ext_id, aid=req.alert_id, ttype=ttype, tval=tval, eby=req.executed_by, ik=ikey, code=http_code, resp=json.dumps(api_resp), rsn=req.reason,
+        eid=ext_id, aid=req.alert_id, ttype=ttype, tval=tval, eby=current_user.email, ik=ikey, code=http_code, resp=json.dumps(api_resp), rsn=req.reason,
     )
     if req.alert_id:
         conn.run(
             """INSERT INTO alert_audit_log (alert_id, changed_by, action_type, field_changed, old_value, new_value, reason)
                VALUES (:aid, :eby, 'ACCION_SOAR', :ttype, 'bloqueado', :nval, :rsn)""",
-            aid=req.alert_id, eby=req.executed_by, ttype=ttype, nval=f"LIBERADO: {tval} (HTTP {http_code})", rsn=req.reason,
+            aid=req.alert_id, eby=current_user.email, ttype=ttype, nval=f"LIBERADO: {tval} (HTTP {http_code})", rsn=req.reason,
         )
     conn.close()
     return {"status": "liberado", "soar_action_id": res[0][0], "http_code": http_code, "api_response": api_resp}
