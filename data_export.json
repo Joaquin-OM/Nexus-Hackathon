@@ -1,7 +1,7 @@
 {
-  "raw_count": 131,
-  "unique_alerts_count": 86,
-  "soar_count": 59,
+  "raw_count": 138,
+  "unique_alerts_count": 91,
+  "soar_count": 60,
   "alerts": [
     {
       "id": 165,
@@ -77,6 +77,81 @@
       "category": "Revisión semántica provisional · Fraude / Phishing",
       "status": "en_revision",
       "desc": "SOC informa de un correo sospechoso que contiene un enlace. No se aportan remitente técnico, URL, destinatario ni interacción del usuario."
+    },
+    {
+      "id": 173,
+      "internal_id": "AL-20261030-0015",
+      "timestamp": "2026-10-30 06:15:49+00:00",
+      "class": "Intrusión",
+      "subclass": "Compromiso de cuenta de usuario",
+      "severity": "ALTA",
+      "user": "ogonzalez@sampol.com",
+      "host": "app-barcelona-015",
+      "ip": "203.0.113.24",
+      "site": "Barcelona",
+      "category": "ACCOUNT-LAB-06",
+      "status": "cerrada",
+      "desc": "Se emitió un token para ogonzalez@sampol.com desde 203.0.113.24. La persona titular confirma que no realizó esa conexión y no existe acceso delegado autorizado."
+    },
+    {
+      "id": 174,
+      "internal_id": "AL-20261030-0194",
+      "timestamp": "2026-10-30 06:06:33+00:00",
+      "class": "Vulnerable",
+      "subclass": "Configuración insegura / Credenciales débiles",
+      "severity": "MEDIA",
+      "user": "nmartinez@sampol.com",
+      "host": "pc-madrid-034",
+      "ip": "198.51.100.23",
+      "site": "Madrid",
+      "category": "DISCLOSE-LAB-05",
+      "status": "nueva",
+      "desc": "Una ruta de pc-madrid-034 expone metadatos internos sin autenticación. No se han utilizado secretos ni accedido a datos personales."
+    },
+    {
+      "id": 172,
+      "internal_id": "AL-20261030-0050",
+      "timestamp": "2026-10-30 06:04:49+00:00",
+      "class": "Intento de intrusión",
+      "subclass": "Explotación de vulnerabilidad (Exploit)",
+      "severity": "ALTA",
+      "user": "dmoreno@sampol.com",
+      "host": "srv-palma-205",
+      "ip": "192.0.2.154",
+      "site": "Palma",
+      "category": "EXPLOIT-LAB-05",
+      "status": "nueva",
+      "desc": "El WAF de srv-palma-205 bloqueó una solicitud desde 192.0.2.154 que coincide con una vulnerabilidad conocida del componente publicado."
+    },
+    {
+      "id": 171,
+      "internal_id": "AL-20261030-0047",
+      "timestamp": "2026-10-30 06:02:49+00:00",
+      "class": "Contenido dañino",
+      "subclass": "Troyano / Backdoor / RAT",
+      "severity": "CRITICA",
+      "user": "bmoreno@sampol.com",
+      "host": "gw-bilbao-204",
+      "ip": "203.0.113.200",
+      "site": "Bilbao",
+      "category": "C2-LAB-02",
+      "status": "nueva",
+      "desc": "El equipo gw-bilbao-204 abre conexiones repetidas al dominio de control sync-gateway.invalid desde la sesión de bmoreno@sampol.com."
+    },
+    {
+      "id": 168,
+      "internal_id": "AL-20261030-0191",
+      "timestamp": "2026-10-30 05:55:57+00:00",
+      "class": "Vulnerable",
+      "subclass": "Configuración insegura / Credenciales débiles",
+      "severity": "MEDIA",
+      "user": "N/A",
+      "host": "app-valencia-031",
+      "ip": "198.51.100.20",
+      "site": "Valencia",
+      "category": "TLS-LAB-02",
+      "status": "nueva",
+      "desc": "El servicio app-valencia-031 acepta una configuración criptográfica obsoleta en el puerto publicado, accesible desde 198.51.100.20."
     },
     {
       "id": 166,
@@ -1295,6 +1370,18 @@
     }
   ],
   "soar": [
+    {
+      "id": 61,
+      "alert_id": 173,
+      "action": "bloquear",
+      "type": "usuario",
+      "target": "ogonzalez@sampol.com",
+      "trigger": "automatico_directriz_1",
+      "status": "registrado_error_api",
+      "executed_by": "SOAR Auto-Blocker Engine",
+      "executed_at": "2026-11-03 18:45:45.843170+00:00",
+      "reason": "[DIRECTRIZ 1 TI · BLOQUEO AUTÓNOMO] Contención inmediata de cuenta comprometida 'ogonzalez@sampol.com' tras alerta AL-20261030-0015 (SOC-20261103-113-3ECB97) por ACCOUNT-LAB-06 (Intrusión). Motivo: Acceso con credenciales comprometidas / no reconocido por el titular"
+    },
     {
       "id": 60,
       "alert_id": 162,
