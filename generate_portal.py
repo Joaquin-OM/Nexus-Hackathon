@@ -15,12 +15,19 @@ def main():
     soar_count = data.get('soar_count', 62)
     notif_count = data.get('notifications_count', 50)
     p1_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P1')
+    p2_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P2')
+    p3_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P3')
+    p4_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P4')
+    unack_count = sum(1 for n in data.get('notifications', []) if not n.get('acknowledged'))
 
     html_content = f"""<!DOCTYPE html>
 <html lang="es" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>
+  <meta http-equiv='Pragma' content='no-cache'>
+  <meta http-equiv='Expires' content='0'>
   <title>NEXUS SOC 2.0 — SAMPOL</title>
   <link rel="icon" type="image/png" href="./assets/brand/sampol_favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,104 +57,114 @@ def main():
           }}
         }}
       }}
-    }}
+    }};
   </script>
 </head>
-<body class="bg-[#F8FAFC] dark:bg-[#0B1118] text-[#0F172A] dark:text-[#F8FAFC] font-sans antialiased min-h-screen flex">
+<body class="bg-[#F8FAFC] dark:bg-[#0B1118] text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col font-sans">
 
   <!-- =========================================================================
-       SIDEBAR LATERAL CORPORATIVO
+       SIDEBAR LATERAL (REORGANIZACIÓN OPERATIVA SAMPOL)
        ========================================================================= -->
-  <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#111A24] border-r border-[#E2E8F0] dark:border-[#1E293B] flex flex-col transition-transform duration-200 ease-in-out md:translate-x-0 -translate-x-full">
+  <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-40 w-64 max-w-[80vw] bg-white dark:bg-[#111A24] border-r border-[#E2E8F0] dark:border-[#1E293B] flex flex-col transition-transform duration-200 ease-in-out md:translate-x-0 -translate-x-full">
     
-    <!-- CABECERA DE MARCA -->
+    <!-- CABECERA DE MARCA SAMPOL -->
     <div class="px-5 py-4 border-b border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
-        <img src="./assets/brand/sampol_logo_color.png" alt="SAMPOL" class="h-7 w-auto dark:hidden" onerror="this.style.display='none'">
-        <img src="./assets/brand/sampol_logo_blanco.png" alt="SAMPOL" class="h-7 w-auto hidden dark:block" onerror="this.style.display='none'">
-        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">SOC 2.0</span>
+        <img src="./assets/brand/sampol_logo_color.png" alt="SAMPOL" class="h-6 w-auto block dark:hidden">
+        <img src="./assets/brand/sampol_logo_blanco.png" alt="SAMPOL" class="h-6 w-auto hidden dark:block">
+        <div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+        <div>
+          <span class="text-xs font-bold text-slate-900 dark:text-white tracking-tight">NEXUS SOC</span>
+          <span class="block text-[9px] text-[#0784B7] dark:text-[#38BDF8] font-semibold tracking-wider">OPERATIONS 2.0</span>
+        </div>
       </div>
-      <button onclick="toggleSidebar()" class="md:hidden p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white" aria-label="Cerrar navegación">
+      <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 dark:hover:text-white" aria-label="Cerrar navegación">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
 
-    <!-- ENTORNO -->
-    <div class="px-5 py-2 bg-slate-50 dark:bg-slate-900/60 border-b border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-between text-[11px]">
-      <span class="text-slate-500 dark:text-slate-400">Entorno Demo</span>
-      <span class="font-semibold text-[#0784B7] dark:text-[#38BDF8]">Hackathon 24h</span>
-    </div>
-
-    <!-- NAVEGACIÓN -->
-    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-xs">
+    <!-- NAVEGACIÓN AGRUPADA POR JERARQUÍA OPERATIVA -->
+    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-4 text-xs">
       
-      <!-- SECCIÓN: OPERACIONES -->
+      <!-- BLOQUE 1: OPERACIONES -->
       <div>
         <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Operaciones</div>
         <div class="space-y-0.5">
-          <button onclick="switchTab('tab-resumen')" id="btn-tab-resumen" class="sidebar-nav-item active w-full text-left">
+          <button onclick="switchTab('tab-resumen')" id="btn-tab-resumen" class="sidebar-nav-item w-full text-left active">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
             <span class="flex-1">Dashboard</span>
+          </button>
+          <button onclick="switchTab('tab-incidentes')" id="btn-tab-incidentes" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="siren" class="w-4 h-4"></i>
+            <span class="flex-1">Incidentes</span>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900">{p1_count} P1</span>
           </button>
           <button onclick="switchTab('tab-dataset')" id="btn-tab-dataset" class="sidebar-nav-item w-full text-left">
             <i data-lucide="shield-alert" class="w-4 h-4"></i>
             <span class="flex-1">Alertas</span>
             <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{total_alerts}</span>
           </button>
-          <button onclick="switchTab('tab-notifications')" id="btn-tab-notifications" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span class="flex-1">Notificaciones</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900">{p1_count} P1</span>
-          </button>
           <button onclick="switchTab('tab-forense')" id="btn-tab-forense" class="sidebar-nav-item w-full text-left">
             <i data-lucide="network" class="w-4 h-4"></i>
             <span class="flex-1">Investigación</span>
           </button>
+          <button onclick="switchTab('tab-notifications')" id="btn-tab-notifications" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span class="flex-1">Notificaciones</span>
+          </button>
         </div>
       </div>
 
-      <!-- SECCIÓN: GESTIÓN -->
+      <!-- BLOQUE 2: INFRAESTRUCTURA -->
       <div>
-        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Gestión</div>
+        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Infraestructura</div>
         <div class="space-y-0.5">
+          <button onclick="switchTab('tab-activos')" id="btn-tab-activos" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="server" class="w-4 h-4"></i>
+            <span class="flex-1">Activos</span>
+          </button>
+          <button onclick="switchTab('tab-usuarios')" id="btn-tab-usuarios" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span class="flex-1">Usuarios</span>
+          </button>
           <button onclick="switchTab('tab-soar')" id="btn-tab-soar" class="sidebar-nav-item w-full text-left">
             <i data-lucide="shield-check" class="w-4 h-4"></i>
             <span class="flex-1">Respuesta</span>
             <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{soar_count}</span>
           </button>
-          <button onclick="switchTab('tab-activos')" id="btn-tab-activos" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="server" class="w-4 h-4"></i>
-            <span class="flex-1">Activos</span>
-          </button>
           <button onclick="switchTab('tab-automations')" id="btn-tab-automations" class="sidebar-nav-item w-full text-left">
             <i data-lucide="workflow" class="w-4 h-4"></i>
-            <span class="flex-1">Automatización</span>
+            <span class="flex-1">Automatizaciones</span>
           </button>
         </div>
       </div>
 
-      <!-- SECCIÓN: GOBIERNO -->
+      <!-- BLOQUE 3: ANÁLISIS Y CONTROL -->
       <div>
-        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Gobierno</div>
+        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Análisis y Control</div>
         <div class="space-y-0.5">
+          <button onclick="switchTab('tab-informes')" id="btn-tab-informes" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span class="flex-1">Informes</span>
+          </button>
           <button onclick="switchTab('tab-roi')" id="btn-tab-roi" class="sidebar-nav-item w-full text-left">
             <i data-lucide="chart-line" class="w-4 h-4"></i>
             <span class="flex-1">Finanzas</span>
-          </button>
-          <button onclick="switchTab('tab-directrices')" id="btn-tab-directrices" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="file-check-2" class="w-4 h-4"></i>
-            <span class="flex-1">Directrices</span>
           </button>
           <button onclick="switchTab('tab-auditoria')" id="btn-tab-auditoria" class="sidebar-nav-item w-full text-left">
             <i data-lucide="clipboard-list" class="w-4 h-4"></i>
             <span class="flex-1">Auditoría</span>
           </button>
+          <button onclick="switchTab('tab-configuracion')" id="btn-tab-configuracion" class="sidebar-nav-item w-full text-left">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span class="flex-1">Configuración</span>
+          </button>
         </div>
       </div>
 
-    </nav>
+    </div>
 
-    <!-- ESTADO CONEXIÓN INFERIOR -->
+    <!-- PIE DEL SIDEBAR: ESTADO SENSOR -->
     <div class="p-3.5 border-t border-[#E2E8F0] dark:border-[#1E293B] bg-slate-50/70 dark:bg-slate-900/50 text-[11px] flex items-center justify-between text-slate-500 dark:text-slate-400">
       <div class="flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-[#42A83B]"></span>
@@ -164,10 +181,10 @@ def main():
        ÁREA DE CONTENIDO
        ========================================================================= -->
   <div class="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full max-w-full overflow-x-clip">
-    
+
     <!-- HEADER SUPERIOR -->
-    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#111A24]/95 backdrop-blur-sm border-b border-[#E2E8F0] dark:border-[#1E293B] px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-      
+    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#111A24]/95 backdrop-blur-sm border-b border-[#E2E8F0] dark:border-[#1E293B] px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-4 min-w-0 w-full">
+
       <!-- IZQUIERDA: HAMBURGUESA Y BREADCRUMB -->
       <div class="flex items-center space-x-3">
         <button onclick="toggleSidebar()" class="md:hidden p-1.5 rounded text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Abrir navegación">
@@ -192,7 +209,7 @@ def main():
 
       <!-- DERECHA: ACCIONES Y USUARIO -->
       <div class="flex items-center space-x-2 text-xs">
-        
+
         <!-- ESTADO GRAPH -->
         <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px]">
           <span class="w-1.5 h-1.5 rounded-full bg-[#42A83B]"></span>
@@ -222,7 +239,7 @@ def main():
     </header>
 
     <!-- DRAWER LATERAL DE NOTIFICACIONES -->
-    <aside id="bell-drawer" class="fixed top-14 right-4 w-88 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-lg shadow-lg p-4 z-50 hidden space-y-3">
+    <aside id="bell-drawer" class="fixed top-14 right-2 sm:right-4 w-88 max-w-[calc(100vw-1.5rem)] max-h-[80vh] overflow-y-auto bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-lg shadow-lg p-4 z-50 hidden space-y-3">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
         <div>
           <strong class="text-xs font-semibold text-slate-900 dark:text-white">Avisos Prioritarios</strong>
@@ -236,136 +253,321 @@ def main():
         <!-- Inyección JS -->
       </div>
       <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
-        <button onclick="switchTab('tab-notifications'); toggleBellDrawer();" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline">
-          Ver todas las notificaciones →
+        <button onclick="switchTab('tab-incidentes'); toggleBellDrawer();" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline">
+          Ver todos los incidentes →
         </button>
       </div>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl w-full mx-auto space-y-6 min-w-0">
+    <main class="flex-1 p-3.5 sm:p-5 lg:p-6 max-w-7xl w-full mx-auto space-y-6 min-w-0">
 
       <!-- =====================================================================
-           TAB 1: DASHBOARD
+           TAB 1: DASHBOARD OPERATIVO (CENTRADÍSIMO EN INCIDENTES)
            ===================================================================== -->
-      <section id="tab-resumen" class="tab-content space-y-5 min-w-0 w-full">
-        
-        <!-- ENCABEZADO -->
+      <section id="tab-resumen" class="tab-content min-w-0 w-full space-y-5">
+
+        <!-- CABECERA DE OPERACIONES -->
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Resumen de seguridad y operaciones.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Estado de seguridad y gestión de incidentes en tiempo real.</p>
           </div>
-          <button onclick="location.reload()" class="btn-sampol-secondary text-xs">
-            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-            <span>Actualizar</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <select class="px-2.5 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:border-[#0784B7]">
+              <option>Hoy (Últimas 24h)</option>
+              <option>Últimos 7 días</option>
+              <option>Mes actual</option>
+            </select>
+            <span class="text-[11px] px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-medium flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              alertas-soc-1 · En vivo
+            </span>
+            <button onclick="location.reload()" class="btn-sampol-secondary text-xs" title="Actualizar datos">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Actualizar</span>
+            </button>
+          </div>
         </div>
 
-        <!-- 5 INDICADORES PRINCIPALES (SOBRIOS Y MINIMALISTAS) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <!-- 1. BLOQUE PRINCIPAL: INCIDENTES PRIORITARIOS (ATENCIÓN INMEDIATA) -->
+        <div class="sampol-card p-4 space-y-3 border-l-4 border-l-[#DC2626]">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <div class="flex items-center gap-2">
+              <i data-lucide="siren" class="w-4 h-4 text-rose-600"></i>
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Incidentes Prioritarios (Atención Requerida)</h2>
+              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-800">{p1_count} Críticos P1</span>
+            </div>
+            <button onclick="switchTab('tab-incidentes')" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline flex items-center gap-1">
+              Ver todos los incidentes ({notif_count}) <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
           
-          <div class="sampol-card p-3.5">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Alertas Recibidas</div>
-            <div class="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">{raw_count}</div>
-            <div class="text-[10px] text-slate-400 mt-1">Sensor Outlook</div>
+          <div id="dashboard-priority-incidents" class="space-y-2.5">
+            <!-- Inyección JS con incidentes prioritarios -->
+          </div>
+        </div>
+
+        <!-- 2. SEGUNDO BLOQUE: INDICADORES OPERATIVOS COMPACTOS (CLICABLES) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+
+          <div onclick="switchTab('tab-incidentes'); setIncFilter('all');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Incidentes Abiertos</div>
+            <div class="text-xl font-bold text-slate-900 dark:text-white mt-0.5">{notif_count}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">En supervisión</div>
           </div>
 
-          <div class="sampol-card p-3.5">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Alertas Únicas</div>
-            <div class="text-2xl font-bold text-[#0784B7] dark:text-[#38BDF8] mt-0.5">{total_alerts}</div>
-            <div class="text-[10px] text-slate-400 mt-1">Taxonomía INCIBE</div>
+          <div onclick="switchTab('tab-incidentes'); setIncFilter('P1');" class="sampol-card p-3 cursor-pointer hover:border-rose-400 transition bg-rose-50/20 dark:bg-rose-950/10">
+            <div class="text-[11px] font-medium text-rose-600 dark:text-rose-400">Críticos P1</div>
+            <div class="text-xl font-bold text-rose-600 dark:text-rose-400 mt-0.5">{p1_count}</div>
+            <div class="text-[10px] text-rose-500 mt-0.5">SLA 15 minutos</div>
           </div>
 
-          <div class="sampol-card p-3.5">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Incidentes Críticos</div>
-            <div class="text-2xl font-bold text-[#DC2626] mt-0.5">{p1_count}</div>
-            <div class="text-[10px] text-slate-400 mt-1">SLA 15 minutos</div>
+          <div onclick="switchTab('tab-incidentes'); setIncFilter('unack');" class="sampol-card p-3 cursor-pointer hover:border-amber-400 transition">
+            <div class="text-[11px] font-medium text-amber-600 dark:text-amber-400">Sin Reconocer</div>
+            <div id="stat-unack-dashboard" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-0.5">{unack_count}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Requieren acuse</div>
           </div>
 
-          <div class="sampol-card p-3.5">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Contención SOAR</div>
-            <div class="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">{soar_count}</div>
-            <div class="text-[10px] text-slate-400 mt-1">Directriz 1 (18:00)</div>
+          <div onclick="switchTab('tab-incidentes'); setIncFilter('unassigned');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Sin Responsable</div>
+            <div class="text-xl font-bold text-slate-700 dark:text-slate-300 mt-0.5">4</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Pendiente asignación</div>
           </div>
 
-          <div class="sampol-card p-3.5 col-span-2 sm:col-span-1">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Ahorro Anual ROI</div>
-            <div class="text-2xl font-bold text-[#42A83B] mt-0.5">184.500 €</div>
-            <div class="text-[10px] text-slate-400 mt-1">Payback 42 días</div>
+          <div onclick="switchTab('tab-incidentes'); setIncFilter('investigating');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
+            <div class="text-[11px] font-medium text-[#0784B7] dark:text-[#38BDF8]">En Investigación</div>
+            <div class="text-xl font-bold text-[#0784B7] dark:text-[#38BDF8] mt-0.5">38</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Guardia activa</div>
+          </div>
+
+          <div onclick="switchTab('tab-soar')" class="sampol-card p-3 cursor-pointer hover:border-emerald-400 transition">
+            <div class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Contención SOAR</div>
+            <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{soar_count}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Acciones ejecutadas</div>
           </div>
 
         </div>
 
-        <!-- GRÁFICOS: CATEGORÍAS Y GRAVEDAD -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="sampol-card p-4 lg:col-span-2">
+        <!-- 3. TERCER BLOQUE: ALERTAS RECIENTES RELEVANTES -->
+        <div class="sampol-card p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Alertas Recientes Relevantes</h2>
+              <p class="text-[11px] text-slate-400">Eventos de severidad crítica y alta recibidos por los sensores del SOC.</p>
+            </div>
+            <button onclick="switchTab('tab-dataset')" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline flex items-center gap-1">
+              Ver centro de alertas ({total_alerts}) <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto min-w-0 w-full">
+            <table class="sampol-table min-w-full">
+              <thead>
+                <tr>
+                  <th>Fecha (UTC)</th>
+                  <th>Código</th>
+                  <th>Gravedad</th>
+                  <th>Categoría INCIBE</th>
+                  <th>Activo / Usuario</th>
+                  <th>Incidente Asociado</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-recent-alerts">
+                <!-- Inyección JS con las 5 alertas más críticas -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. CUARTO BLOQUE: ACTIVIDAD RECIENTE DEL SOC -->
+        <div class="sampol-card p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+            <h2 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Actividad del SOC (Auditoría en Vivo)</h2>
+            <span class="text-[10px] font-mono text-slate-400">Trazabilidad RFC 822</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
+              <div class="space-y-0.5">
+                <span class="font-semibold text-rose-600 dark:text-rose-400">Incidente P1 Escalado a Dirección:</span>
+                <span class="text-slate-600 dark:text-slate-300">INC-CAMP-MORENO notificado a dirti@sampol.com conforme a SLA de 15m.</span>
+                <div class="text-[10px] text-slate-400 font-mono">Actor: SLA_DAEMON · Ref: SOL-B-014</div>
+              </div>
+              <span class="font-mono text-[10px] text-slate-400 shrink-0">19:14 UTC</span>
+            </div>
+            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
+              <div class="space-y-0.5">
+                <span class="font-semibold text-purple-600 dark:text-purple-400">Acción SOAR Ejecutada:</span>
+                <span class="text-slate-600 dark:text-slate-300">Aislamiento autónomo de cuenta 'dmoreno@sampol.com' bajo Directriz 1.</span>
+                <div class="text-[10px] text-slate-400 font-mono">Actor: AUTOBLOCK_ENGINE · HTTP 201 OK</div>
+              </div>
+              <span class="font-mono text-[10px] text-slate-400 shrink-0">19:06 UTC</span>
+            </div>
+            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
+              <div class="space-y-0.5">
+                <span class="font-semibold text-[#0784B7] dark:text-[#38BDF8]">Alerta Ingerida:</span>
+                <span class="text-slate-600 dark:text-slate-300">Sensor Outlook procesó mensaje PHISH-EXT-036 con hash forense SHA-256.</span>
+                <div class="text-[10px] text-slate-400 font-mono">Actor: GRAPH_DAEMON · Buzón corporativo</div>
+              </div>
+              <span class="font-mono text-[10px] text-slate-400 shrink-0">18:05 UTC</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. QUINTO BLOQUE: ESTADO GENERAL (GRÁFICOS SECUNDARIOS) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0 w-full">
+          <div class="sampol-card p-4 lg:col-span-2 min-w-0">
             <div class="flex items-center justify-between mb-3">
               <h2 class="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías INCIBE</h2>
-              <span class="text-[11px] text-slate-400">10 clases</span>
+              <span class="text-[11px] text-slate-400">10 clases oficiales</span>
             </div>
-            <div class="h-56">
+            <div class="chart-container min-w-0">
               <canvas id="chart-incibe"></canvas>
             </div>
           </div>
 
-          <div class="sampol-card p-4">
+          <div class="sampol-card p-4 min-w-0">
             <div class="flex items-center justify-between mb-3">
               <h2 class="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Gravedad</h2>
               <span class="text-[11px] text-slate-400">Triaje</span>
             </div>
-            <div class="h-56 flex items-center justify-center">
+            <div class="chart-container flex items-center justify-center min-w-0">
               <canvas id="chart-severity"></canvas>
             </div>
-          </div>
-        </div>
-
-        <!-- ACCESOS RÁPIDOS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div onclick="switchTab('tab-notifications')" class="sampol-card p-4 cursor-pointer hover:border-[#0784B7] transition group">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-900 dark:text-white">Smart Notifications</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0784B7] transition"></i>
-            </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Banco de pruebas y reducción del 96.4% de fatiga.</p>
-          </div>
-
-          <div onclick="switchTab('tab-soar')" class="sampol-card p-4 cursor-pointer hover:border-[#0784B7] transition group">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-900 dark:text-white">Centro de Respuesta</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0784B7] transition"></i>
-            </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">62 contenciones automáticas ante intrusiones.</p>
-          </div>
-
-          <div onclick="switchTab('tab-roi')" class="sampol-card p-4 cursor-pointer hover:border-[#0784B7] transition group">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-900 dark:text-white">Modelo Financiero</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0784B7] transition"></i>
-            </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Calculadora interactiva con datos del Director de TI.</p>
           </div>
         </div>
 
       </section>
 
       <!-- =====================================================================
-           TAB 2: ALERTAS
+           TAB 2: GESTIÓN DE INCIDENTES (NUEVA PÁGINA CENTRAL)
            ===================================================================== -->
-      <section id="tab-dataset" class="tab-content hidden space-y-4 min-w-0 w-full">
+      <section id="tab-incidentes" class="tab-content hidden min-w-0 w-full space-y-4">
+
+        <!-- CABECERA DE INCIDENTES -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Incidentes</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestión operativa, asignación y seguimiento de casos de ciberseguridad.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- VISTA TABLA / KANBAN -->
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+              <button onclick="setIncidentView('table')" id="btn-view-table" class="px-3 py-1 text-xs font-medium rounded-l border border-slate-300 dark:border-slate-700 bg-[#0784B7] text-white">
+                Tabla
+              </button>
+              <button onclick="setIncidentView('kanban')" id="btn-view-kanban" class="px-3 py-1 text-xs font-medium rounded-r border border-l-0 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50">
+                Kanban
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTROS DE INCIDENTES -->
+        <div class="sampol-card p-3 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+              <button onclick="setIncFilter('all')" id="btn-inc-all" class="px-2.5 py-1 rounded bg-[#0784B7] text-white font-medium">Todos ({notif_count})</button>
+              <button onclick="setIncFilter('P1')" id="btn-inc-P1" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">P1 Críticos ({p1_count})</button>
+              <button onclick="setIncFilter('P2')" id="btn-inc-P2" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">P2 Altos ({p2_count})</button>
+              <button onclick="setIncFilter('unack')" id="btn-inc-unack" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">Sin Reconocer</button>
+              <button onclick="setIncFilter('investigating')" id="btn-inc-investigating" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">En Investigación</button>
+            </div>
+            <div class="w-full sm:w-64 min-w-0">
+              <input type="text" id="inc-search" oninput="renderIncidentsTable()" placeholder="Buscar por ID, usuario, activo..." class="w-full px-2.5 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:border-[#0784B7] text-slate-900 dark:text-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- VISTA TABLA (ESCRITORIO + TARJETAS MÓVILES) -->
+        <div id="incidents-table-view" class="sampol-card overflow-hidden min-w-0 w-full">
+          <div class="hidden md:block overflow-x-auto max-h-[600px] min-w-0 w-full">
+            <table class="sampol-table min-w-full">
+              <thead class="sticky top-0 z-10">
+                <tr>
+                  <th>ID Incidente</th>
+                  <th>Título / Vector</th>
+                  <th>Prioridad</th>
+                  <th>Estado</th>
+                  <th>Activo Afectado</th>
+                  <th>Usuario</th>
+                  <th>Alertas</th>
+                  <th>Responsable</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-incidents" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Inyección JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- MÓVIL: TARJETAS ADAPTATIVAS -->
+          <div id="cards-incidents" class="block md:hidden p-3 space-y-2.5 max-h-[600px] overflow-y-auto min-w-0">
+            <!-- Inyección JS -->
+          </div>
+        </div>
+
+        <!-- VISTA KANBAN (COLUMNAS DE FLUJO OPERATIVO) -->
+        <div id="incidents-kanban-view" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3 min-w-0 w-full">
+          
+          <!-- COL 1: NUEVOS / TRIAJE -->
+          <div class="sampol-card p-3 space-y-2.5 bg-slate-50/50 dark:bg-slate-900/30">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Nuevos / Triaje</span>
+              <span id="kanban-count-new" class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">0</span>
+            </div>
+            <div id="kanban-col-new" class="space-y-2 min-h-[200px]"></div>
+          </div>
+
+          <!-- COL 2: EN INVESTIGACIÓN -->
+          <div class="sampol-card p-3 space-y-2.5 bg-slate-50/50 dark:bg-slate-900/30">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200">En Investigación</span>
+              <span id="kanban-count-investigating" class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">0</span>
+            </div>
+            <div id="kanban-col-investigating" class="space-y-2 min-h-[200px]"></div>
+          </div>
+
+          <!-- COL 3: CONTENIDOS SOAR -->
+          <div class="sampol-card p-3 space-y-2.5 bg-slate-50/50 dark:bg-slate-900/30">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Contenidos SOAR</span>
+              <span id="kanban-count-contained" class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">0</span>
+            </div>
+            <div id="kanban-col-contained" class="space-y-2 min-h-[200px]"></div>
+          </div>
+
+          <!-- COL 4: RESUELTOS -->
+          <div class="sampol-card p-3 space-y-2.5 bg-slate-50/50 dark:bg-slate-900/30">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Resueltos / Cerrados</span>
+              <span id="kanban-count-resolved" class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">0</span>
+            </div>
+            <div id="kanban-col-resolved" class="space-y-2 min-h-[200px]"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           TAB 3: ALERTAS (DATASET COMPLETO)
+           ===================================================================== -->
+      <section id="tab-dataset" class="tab-content hidden min-w-0 w-full space-y-4">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Alertas</h1>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Triaje e inspección bajo taxonomía oficial INCIBE ({total_alerts} únicas).</p>
           </div>
-          <div class="w-full sm:w-72">
+          <div class="w-full sm:w-72 min-w-0">
             <input type="text" id="alert-search" oninput="filterAlerts()" placeholder="Filtrar por código, usuario..." class="w-full px-3 py-1.5 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:border-[#0784B7] text-slate-900 dark:text-white">
           </div>
         </div>
 
         <div class="sampol-card overflow-hidden min-w-0 w-full">
-          <!-- VISTA ESCRITORIO Y TABLET: TABLA CON SCROLL INTERNO -->
+          <!-- VISTA ESCRITORIO Y TABLET -->
           <div class="hidden md:block overflow-x-auto max-h-[580px] min-w-0 w-full">
             <table class="sampol-table min-w-full">
               <thead class="sticky top-0 z-10">
@@ -385,23 +587,104 @@ def main():
             </table>
           </div>
 
-          <!-- VISTA MÓVIL: TARJETAS VERTICALES ADAPTATIVAS (0 DESBORDAMIENTO) -->
+          <!-- VISTA MÓVIL: TARJETAS ADAPTATIVAS -->
           <div id="cards-alerts" class="block md:hidden p-3 space-y-2.5 max-h-[580px] overflow-y-auto min-w-0">
-            <!-- Inyección JS para móvil -->
+            <!-- Inyección JS -->
           </div>
         </div>
 
       </section>
 
       <!-- =====================================================================
-           TAB 3: NOTIFICACIONES
+           TAB 4: INVESTIGACIÓN (KILL CHAIN FORENSE)
            ===================================================================== -->
-      <section id="tab-notifications" class="tab-content hidden space-y-4 min-w-0 w-full">
+      <section id="tab-forense" class="tab-content hidden min-w-0 w-full space-y-4">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Investigación</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Análisis pericial de la Kill Chain, paciente cero y reducción de dwell time.</p>
+        </div>
+
+        <!-- ETAPAS -->
+        <div class="sampol-card p-4 space-y-2.5 text-xs">
+          <div class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Cronología del Incidente (MITRE ATT&CK)</div>
+
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
+            <span><strong>1. Phishing:</strong> AL-20261030-0025 recibido en buzón de jmoreno@sampol.com.</span>
+            <span class="font-mono text-[10px] text-slate-400 shrink-0">02:41 UTC</span>
+          </div>
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
+            <span><strong>2. Password Spray:</strong> AL-20261030-0026 detecta 43 autenticaciones anómalas.</span>
+            <span class="font-mono text-[10px] text-slate-400 shrink-0">02:54 UTC</span>
+          </div>
+          <div class="p-2.5 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
+            <span class="text-rose-700 dark:text-rose-300"><strong>3. Paciente Cero:</strong> Emisión ilegítima de token para jmoreno@sampol.com.</span>
+            <span class="font-mono text-[10px] text-rose-600 font-bold shrink-0">03:20 UTC</span>
+          </div>
+          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
+            <span><strong>4. Exfiltración:</strong> Lectura y modificación de ficheros en srv-barcelona-201.</span>
+            <span class="font-mono text-[10px] text-slate-400 shrink-0">03:33 UTC</span>
+          </div>
+          <div class="p-2.5 rounded border border-rose-300 dark:border-rose-800 bg-rose-100/40 dark:bg-rose-950/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
+            <span class="text-rose-800 dark:text-rose-200"><strong>5. Canal C2:</strong> Balizamiento hacia sync-gateway.invalid (Precursor Ransomware).</span>
+            <span class="font-mono text-[10px] text-rose-700 font-bold shrink-0">03:46 UTC</span>
+          </div>
+        </div>
+
+        <!-- IOCS -->
+        <div class="sampol-card p-4 min-w-0 w-full overflow-hidden">
+          <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs mb-3">Indicadores de Compromiso (IoCs)</div>
+          <div class="overflow-x-auto min-w-0 w-full">
+            <table class="sampol-table min-w-full">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Artefacto</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge-medium">Dominio</span></td>
+                  <td class="font-mono font-medium text-slate-800 dark:text-slate-200">sync-gateway.invalid</td>
+                  <td>C2 / Balizamiento</td>
+                  <td class="text-emerald-600 font-medium">Bloqueado</td>
+                </tr>
+                <tr>
+                  <td><span class="badge-medium">Dominio</span></td>
+                  <td class="font-mono font-medium text-slate-800 dark:text-slate-200">login-acceso.invalid</td>
+                  <td>Phishing</td>
+                  <td class="text-emerald-600 font-medium">Bloqueado</td>
+                </tr>
+                <tr>
+                  <td><span class="badge-high">IP</span></td>
+                  <td class="font-mono font-medium text-slate-800 dark:text-slate-200">203.0.113.150 / 200</td>
+                  <td>Origen</td>
+                  <td class="text-emerald-600 font-medium">Aislado</td>
+                </tr>
+                <tr>
+                  <td><span class="badge-critical">Cuenta</span></td>
+                  <td class="font-mono font-medium text-rose-600 font-bold">jmoreno@sampol.com</td>
+                  <td>Paciente Cero</td>
+                  <td class="text-emerald-600 font-medium">Sesión Revocada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           TAB 5: NOTIFICACIONES (MOTOR ANTI-FATIGA)
+           ===================================================================== -->
+      <section id="tab-notifications" class="tab-content hidden min-w-0 w-full space-y-4">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Notificaciones</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestión de avisos inteligentes y anti-fatiga (200.000 alertas/día).</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestión de avisos inteligentes y anti-fatiga (capacidad 200.000 alertas/día).</p>
           </div>
           <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
             Throughput: 238.000 alertas/s (0.004 ms)
@@ -435,7 +718,7 @@ def main():
         <!-- SIMULADOR DEMO -->
         <div class="sampol-card p-4 space-y-3">
           <div class="text-xs font-semibold text-slate-700 dark:text-slate-300">Simulación de Escenarios (Modo Demo)</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs min-w-0">
             <button onclick="runScenarioA()" class="p-2.5 rounded border border-slate-200 dark:border-slate-700 hover:border-[#0784B7] text-left transition">
               <div class="font-semibold text-slate-900 dark:text-white">Escenario A: Ráfaga 5.000</div>
               <div class="text-[11px] text-slate-500 mt-0.5">Consolidación en 1 ticket único.</div>
@@ -464,7 +747,7 @@ def main():
             <button onclick="setNotifFilter('P2')" id="btn-nf-P2" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">P2 Altas</button>
             <button onclick="setNotifFilter('unack')" id="btn-nf-unack" class="px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">Sin Reconocer</button>
           </div>
-          <div class="w-full sm:w-64">
+          <div class="w-full sm:w-64 min-w-0">
             <input type="text" id="notif-search" oninput="renderNotifsTable()" placeholder="Buscar por usuario, ID..." class="w-full px-2.5 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:border-[#0784B7] text-slate-900 dark:text-white">
           </div>
         </div>
@@ -477,90 +760,131 @@ def main():
       </section>
 
       <!-- =====================================================================
-           TAB 4: INVESTIGACIÓN
+           TAB 6: ACTIVOS
            ===================================================================== -->
-      <section id="tab-forense" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
+      <section id="tab-activos" class="tab-content hidden min-w-0 w-full space-y-4">
+
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Investigación</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Análisis de la Kill Chain, paciente cero y reducción de dwell time.</p>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Activos</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sistemas e infraestructura crítica bajo supervisión activa.</p>
         </div>
 
-        <!-- ETAPAS -->
-        <div class="sampol-card p-4 space-y-2.5 text-xs">
-          <div class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Cronología del Incidente (MITRE ATT&CK)</div>
-          
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
-            <span><strong>1. Phishing:</strong> AL-20261030-0025 recibido en buzón de jmoreno@sampol.com.</span>
-            <span class="font-mono text-[10px] text-slate-400">02:41 UTC</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs min-w-0 w-full">
+          <div class="sampol-card p-4 space-y-2.5">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">Servidores de Aplicación y Datos</div>
+            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <div>
+                <div class="font-semibold text-slate-800 dark:text-slate-200">srv-barcelona-201</div>
+                <div class="text-[10px] text-slate-400">Sede Barcelona · Servidor de Proyectos</div>
+              </div>
+              <span class="badge-critical">Comprometido</span>
+            </div>
+            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <div>
+                <div class="font-semibold text-slate-800 dark:text-slate-200">gw-bilbao-204</div>
+                <div class="text-[10px] text-slate-400">Sede Bilbao · Gateway Perimetral</div>
+              </div>
+              <span class="badge-high">Contenido</span>
+            </div>
+            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <div>
+                <div class="font-semibold text-slate-800 dark:text-slate-200">srv-palma-205</div>
+                <div class="text-[10px] text-slate-400">Sede Palma Central · Servidor Principal</div>
+              </div>
+              <span class="badge-low">Protegido</span>
+            </div>
           </div>
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
-            <span><strong>2. Password Spray:</strong> AL-20261030-0026 detecta 43 autenticaciones anómalas.</span>
-            <span class="font-mono text-[10px] text-slate-400">02:54 UTC</span>
-          </div>
-          <div class="p-2.5 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
-            <span class="text-rose-700 dark:text-rose-300"><strong>3. Paciente Cero:</strong> Emisión ilegítima de token para jmoreno@sampol.com.</span>
-            <span class="font-mono text-[10px] text-rose-600 font-bold">03:20 UTC</span>
-          </div>
-          <div class="p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
-            <span><strong>4. Exfiltración:</strong> Lectura y modificación de ficheros en srv-barcelona-201.</span>
-            <span class="font-mono text-[10px] text-slate-400">03:33 UTC</span>
-          </div>
-          <div class="p-2.5 rounded border border-rose-300 dark:border-rose-800 bg-rose-100/40 dark:bg-rose-950/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 min-w-0 break-words">
-            <span class="text-rose-800 dark:text-rose-200"><strong>5. Canal C2:</strong> Balizamiento hacia sync-gateway.invalid (Precursor Ransomware).</span>
-            <span class="font-mono text-[10px] text-rose-700 font-bold">03:46 UTC</span>
-          </div>
-        </div>
 
-        <!-- IOCS -->
-        <div class="sampol-card p-4 min-w-0 w-full overflow-hidden">
-          <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs mb-3">Indicadores de Compromiso (IoCs)</div>
-          <div class="overflow-x-auto min-w-0 w-full">
-            <table class="sampol-table min-w-full">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Artefacto</th>
-                <th>Rol</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="badge-medium">Dominio</span></td>
-                <td class="font-mono font-medium text-slate-800 dark:text-slate-200">sync-gateway.invalid</td>
-                <td>C2 / Balizamiento</td>
-                <td class="text-emerald-600 font-medium">Bloqueado</td>
-              </tr>
-              <tr>
-                <td><span class="badge-medium">Dominio</span></td>
-                <td class="font-mono font-medium text-slate-800 dark:text-slate-200">login-acceso.invalid</td>
-                <td>Phishing</td>
-                <td class="text-emerald-600 font-medium">Bloqueado</td>
-              </tr>
-              <tr>
-                <td><span class="badge-high">IP</span></td>
-                <td class="font-mono font-medium text-slate-800 dark:text-slate-200">203.0.113.150 / 200</td>
-                <td>Origen</td>
-                <td class="text-emerald-600 font-medium">Aislado</td>
-              </tr>
-              <tr>
-                <td><span class="badge-critical">Cuenta</span></td>
-                <td class="font-mono font-medium text-rose-600 font-bold">jmoreno@sampol.com</td>
-                <td>Paciente Cero</td>
-                <td class="text-emerald-600 font-medium">Sesión Revocada</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="sampol-card p-4 space-y-2.5">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">Políticas de Red y Segmentación OT</div>
+            <div class="p-2 rounded border border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20">
+              <div class="font-medium text-emerald-800 dark:text-emerald-300">Plantas de Cogeneración & Aeropuertos</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Exclusión estricta en lista blanca SOAR. Toda contención exige supervisión humana.</div>
+            </div>
+            <div class="p-2 rounded border border-slate-200 dark:border-slate-700">
+              <div class="font-medium text-slate-700 dark:text-slate-300">Buzón de Operaciones SOC</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">equipo_1_hackaton@sampol.com protegido contra bloqueos autónomos.</div>
+            </div>
           </div>
         </div>
 
       </section>
 
       <!-- =====================================================================
-           TAB 5: RESPUESTA (SOAR)
+           TAB 7: USUARIOS (DIRECTORIO DE IDENTIDADES)
            ===================================================================== -->
-      <section id="tab-soar" class="tab-content hidden space-y-4 min-w-0 w-full">
+      <section id="tab-usuarios" class="tab-content hidden min-w-0 w-full space-y-4">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Usuarios</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Supervisión de cuentas corporativas, privilegios y estado de contención.</p>
+        </div>
+
+        <div class="sampol-card overflow-hidden min-w-0 w-full">
+          <div class="overflow-x-auto min-w-0 w-full">
+            <table class="sampol-table min-w-full">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Departamento</th>
+                  <th>Sede</th>
+                  <th>Estado Identidad</th>
+                  <th>Incidentes Asociados</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-mono font-bold text-rose-600">jmoreno@sampol.com</td>
+                  <td>Ingeniería de Proyectos</td>
+                  <td>Barcelona</td>
+                  <td><span class="badge-critical">Bloqueado (SOAR)</span></td>
+                  <td>INC-CAMP-MORENO</td>
+                  <td><button onclick="switchTab('tab-soar')" class="btn-sampol-secondary text-[10px] py-1">Ver Contención</button></td>
+                </tr>
+                <tr>
+                  <td class="font-mono font-bold text-rose-600">bmoreno@sampol.com</td>
+                  <td>Operaciones</td>
+                  <td>Bilbao</td>
+                  <td><span class="badge-critical">Bloqueado (SOAR)</span></td>
+                  <td>INC-USR-bmoreno</td>
+                  <td><button onclick="switchTab('tab-soar')" class="btn-sampol-secondary text-[10px] py-1">Ver Contención</button></td>
+                </tr>
+                <tr>
+                  <td class="font-mono font-bold text-rose-600">cmoreno@sampol.com</td>
+                  <td>Sistemas</td>
+                  <td>Madrid</td>
+                  <td><span class="badge-critical">Bloqueado (SOAR)</span></td>
+                  <td>INC-USR-cmoreno</td>
+                  <td><button onclick="switchTab('tab-soar')" class="btn-sampol-secondary text-[10px] py-1">Ver Contención</button></td>
+                </tr>
+                <tr>
+                  <td class="font-mono font-medium text-slate-900 dark:text-white">director.ti@sampol.com</td>
+                  <td>Dirección de Tecnología</td>
+                  <td>Palma</td>
+                  <td><span class="badge-low">Protegido (VIP)</span></td>
+                  <td>-</td>
+                  <td><span class="text-[11px] text-slate-400">Whitelist Activa</span></td>
+                </tr>
+                <tr>
+                  <td class="font-mono font-medium text-slate-900 dark:text-white">guardia_soc@sampol.com</td>
+                  <td>Centro de Ciberseguridad</td>
+                  <td>Palma</td>
+                  <td><span class="badge-low">Activo (SOC)</span></td>
+                  <td>-</td>
+                  <td><span class="text-[11px] text-slate-400">Superintendente</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           TAB 8: RESPUESTA (SOAR - DIRECTRIZ 1)
+           ===================================================================== -->
+      <section id="tab-soar" class="tab-content hidden min-w-0 w-full space-y-4">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -573,7 +897,7 @@ def main():
         </div>
 
         <div class="sampol-card overflow-hidden min-w-0 w-full">
-          <!-- VISTA ESCRITORIO Y TABLET: TABLA CON SCROLL INTERNO -->
+          <!-- VISTA ESCRITORIO Y TABLET -->
           <div class="hidden md:block overflow-x-auto max-h-[500px] min-w-0 w-full">
             <table class="sampol-table min-w-full">
               <thead class="sticky top-0 z-10">
@@ -592,89 +916,25 @@ def main():
             </table>
           </div>
 
-          <!-- VISTA MÓVIL: TARJETAS VERTICALES ADAPTATIVAS (0 DESBORDAMIENTO) -->
+          <!-- VISTA MÓVIL: TARJETAS ADAPTATIVAS -->
           <div id="cards-soar" class="block md:hidden p-3 space-y-2.5 max-h-[500px] overflow-y-auto min-w-0">
-            <!-- Inyección JS para móvil -->
+            <!-- Inyección JS -->
           </div>
         </div>
 
       </section>
 
       <!-- =====================================================================
-           TAB 6: ACTIVOS
+           TAB 9: AUTOMATIZACIONES
            ===================================================================== -->
-      <section id="tab-activos" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
+      <section id="tab-automations" class="tab-content hidden min-w-0 w-full space-y-4">
+
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Activos</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Identidades y sistemas bajo supervisión activa.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div class="sampol-card p-4 space-y-2.5">
-            <div class="font-semibold text-slate-800 dark:text-slate-200">Identidades Aisladas (SOAR)</div>
-            <div class="p-2 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-rose-700 dark:text-rose-300">jmoreno@sampol.com</div>
-                <div class="text-[10px] text-slate-500">Paciente Cero · Compromiso de Token</div>
-              </div>
-              <span class="badge-critical">Bloqueado</span>
-            </div>
-            <div class="p-2 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-rose-700 dark:text-rose-300">bmoreno@sampol.com</div>
-                <div class="text-[10px] text-slate-500">Spray Masivo · 5.000 eventos</div>
-              </div>
-              <span class="badge-critical">Bloqueado</span>
-            </div>
-            <div class="p-2 rounded border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-rose-700 dark:text-rose-300">cmoreno@sampol.com</div>
-                <div class="text-[10px] text-slate-500">Malware C2</div>
-              </div>
-              <span class="badge-critical">Bloqueado</span>
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 space-y-2.5">
-            <div class="font-semibold text-slate-800 dark:text-slate-200">Infraestructura Crítica</div>
-            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-              <div>
-                <div class="font-semibold text-slate-800 dark:text-slate-200">srv-barcelona-201</div>
-                <div class="text-[10px] text-slate-400">Servidor de Aplicaciones</div>
-              </div>
-              <span class="badge-high">Revisión</span>
-            </div>
-            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-              <div>
-                <div class="font-semibold text-slate-800 dark:text-slate-200">gw-bilbao-204</div>
-                <div class="text-[10px] text-slate-400">Gateway Perimetral</div>
-              </div>
-              <span class="badge-low">Contenido</span>
-            </div>
-            <div class="p-2 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-              <div>
-                <div class="font-semibold text-slate-800 dark:text-slate-200">srv-palma-205</div>
-                <div class="text-[10px] text-slate-400">Servidor Central</div>
-              </div>
-              <span class="badge-low">Protegido</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- =====================================================================
-           TAB 7: AUTOMATIZACIÓN
-           ===================================================================== -->
-      <section id="tab-automations" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Automatización</h1>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Automatizaciones</h1>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pipelines de ingesta continua y contención perimetral.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs min-w-0 w-full">
           <div class="sampol-card p-3.5 space-y-1.5">
             <div class="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white">
               <span class="w-2 h-2 rounded-full bg-[#42A83B]"></span>
@@ -706,20 +966,67 @@ def main():
       </section>
 
       <!-- =====================================================================
-           TAB 8: FINANZAS (CALCULADORA ROI)
+           TAB 10: INFORMES & COMPLIANCE NIS2
            ===================================================================== -->
-      <section id="tab-roi" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
+      <section id="tab-informes" class="tab-content hidden min-w-0 w-full space-y-4">
+
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finanzas</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Retorno de inversión y ahorro operativo (Directorio de TI SAMPOL).</p>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Informes</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Generación y consulta de expedientes de ciberseguridad y pre-notificaciones NIS2.</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs min-w-0 w-full">
+          <div class="sampol-card p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 dark:text-white">Pre-notificación NIS2</span>
+              <span class="badge-low">24h Cumplida</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">Plantilla oficial remitida a INCIBE-CERT bajo el Artículo 23 de la Directiva Europea NIS2.</p>
+            <div class="pt-2">
+              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">PRENOTIFICACION_INCIDENTE_NIS2.docx</span>
+            </div>
+          </div>
+
+          <div class="sampol-card p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 dark:text-white">Informe Forense Kill Chain</span>
+              <span class="badge-low">Pericial</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">Reconstrucción cronológica de accesos, paciente cero y contención de C2.</p>
+            <div class="pt-2">
+              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">INFORME_FORENSE_KILL_CHAIN.docx</span>
+            </div>
+          </div>
+
+          <div class="sampol-card p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 dark:text-white">Memoria de Industrialización</span>
+              <span class="badge-low">Aprobada</span>
+            </div>
+            <p class="text-slate-500 text-[11px]">Plan estratégico de pase a producción de NEXUS SOC 2.0 para Grupo SAMPOL.</p>
+            <div class="pt-2">
+              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">PLAN_INDUSTRIALIZACION_NEXUS.docx</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           TAB 11: FINANZAS (CALCULADORA DE RETORNO Y ROI DEL DIRECTOR)
+           ===================================================================== -->
+      <section id="tab-roi" class="tab-content hidden min-w-0 w-full space-y-4">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finanzas</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Retorno de inversión, ahorro operativo y comparativa económica (Directorio TI).</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0 w-full">
+
           <div class="sampol-card p-4 space-y-4">
             <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">1. Triaje de Alertas</div>
-            
+
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-slate-600 dark:text-slate-400">Volumen mensual:</span>
@@ -747,7 +1054,7 @@ def main():
 
           <div class="sampol-card p-4 space-y-4">
             <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">2. Bloqueo y Desarrollo</div>
-            
+
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-slate-600 dark:text-slate-400">Bloqueos al mes:</span>
@@ -797,60 +1104,10 @@ def main():
       </section>
 
       <!-- =====================================================================
-           TAB 9: DIRECTRICES
+           TAB 12: AUDITORÍA
            ===================================================================== -->
-      <section id="tab-directrices" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Directrices</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Órdenes ejecutivas de TI y cumplimiento normativo NIS2.</p>
-        </div>
+      <section id="tab-auditoria" class="tab-content hidden min-w-0 w-full space-y-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div class="sampol-card p-3.5 space-y-1">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-[#0784B7]">Directriz 09:00</span>
-              <span class="badge-low">Cumplida</span>
-            </div>
-            <div class="font-semibold text-slate-900 dark:text-white">Microsoft Graph & SHA-256</div>
-            <p class="text-slate-500 text-[11px]">Ingesta directa de correos sin pérdidas y cálculo de huella inmutable.</p>
-          </div>
-
-          <div class="sampol-card p-3.5 space-y-1">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-[#0784B7]">Directriz 11:30</span>
-              <span class="badge-low">Cumplida</span>
-            </div>
-            <div class="font-semibold text-slate-900 dark:text-white">Taxonomía INCIBE (10 Clases)</div>
-            <p class="text-slate-500 text-[11px]">Clasificación normalizada conforme a los estándares del CERT.</p>
-          </div>
-
-          <div class="sampol-card p-3.5 space-y-1">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-[#0784B7]">Directriz 15:30</span>
-              <span class="badge-low">Cumplida</span>
-            </div>
-            <div class="font-semibold text-slate-900 dark:text-white">API de Bloqueo Sampol</div>
-            <p class="text-slate-500 text-[11px]">Aislamiento perimetral con doble confirmación y gestión de excepciones.</p>
-          </div>
-
-          <div class="sampol-card p-3.5 space-y-1">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-[#0784B7]">Directriz 18:00</span>
-              <span class="badge-low">Cumplida</span>
-            </div>
-            <div class="font-semibold text-slate-900 dark:text-white">Auto-Bloqueo de Cuentas Comprometidas</div>
-            <p class="text-slate-500 text-[11px]">Aislamiento sub-segundo sin esperar revisión manual ante intrusión confirmada.</p>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- =====================================================================
-           TAB 10: AUDITORÍA
-           ===================================================================== -->
-      <section id="tab-auditoria" class="tab-content hidden space-y-4 min-w-0 w-full">
-        
         <div>
           <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Auditoría</h1>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Trazabilidad inmutable de eventos conforme a NIS2 y ENS.</p>
@@ -864,8 +1121,137 @@ def main():
 
       </section>
 
+      <!-- =====================================================================
+           TAB 13: CONFIGURACIÓN
+           ===================================================================== -->
+      <section id="tab-configuracion" class="tab-content hidden min-w-0 w-full space-y-4">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Configuración</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Parámetros operativos, umbrales de SLA y reglas de Lista Blanca.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs min-w-0 w-full">
+          <div class="sampol-card p-4 space-y-3">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">Umbrales de SLA y Cooldown</div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="text-slate-600 dark:text-slate-400">SLA Incidentes Críticos (P1):</span>
+                <span class="font-semibold text-rose-600">15 minutos</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="text-slate-600 dark:text-slate-400">SLA Incidentes Altos (P2):</span>
+                <span class="font-semibold text-amber-600">60 minutos</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="text-slate-600 dark:text-slate-400">Ventana de Cooldown Anti-Fatiga:</span>
+                <span class="font-semibold text-[#0784B7]">15 minutos</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-slate-600 dark:text-slate-400">Frecuencia Sondeo Graph API:</span>
+                <span class="font-semibold text-emerald-600">45 segundos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sampol-card p-4 space-y-3">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">Salvaguardas de Lista Blanca (Directriz 1)</div>
+            <p class="text-slate-500 text-[11px]">Entidades permanentemente exentas de auto-bloqueo para evitar disrupción de servicios críticos.</p>
+            <div class="space-y-1.5 font-mono text-[11px]">
+              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ director.ti@sampol.com (VIP_DIRECCION)</div>
+              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ equipo_1_hackaton@sampol.com (BUZON_SOC)</div>
+              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ 192.168.10.0/24 (RED_PLANTA_OT)</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
     </main>
 
+  </div>
+
+  <!-- =========================================================================
+       MODAL DE DETALLE Y GESTIÓN DE INCIDENTE
+       ========================================================================= -->
+  <div id="incident-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-4 p-5 min-w-0">
+      
+      <!-- CABECERA MODAL -->
+      <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="modal-inc-id" class="font-mono text-sm font-bold text-[#0784B7] dark:text-[#38BDF8]">INC-ID</span>
+            <span id="modal-inc-priority" class="badge-critical">P1</span>
+            <span id="modal-inc-status" class="badge-low">Activo</span>
+          </div>
+          <h2 id="modal-inc-title" class="text-base font-bold text-slate-900 dark:text-white mt-1">Título del Incidente</h2>
+        </div>
+        <button onclick="closeIncidentModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- DETALLES DEL IMPACTO -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Activo Afectado</div>
+          <div id="modal-inc-asset" class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Usuario</div>
+          <div id="modal-inc-user" class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Alertas Agrupadas</div>
+          <div id="modal-inc-count" class="font-semibold text-[#0784B7] dark:text-[#38BDF8] mt-0.5">1</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Score de Riesgo</div>
+          <div id="modal-inc-score" class="font-bold text-rose-600 mt-0.5">100 / 100</div>
+        </div>
+      </div>
+
+      <!-- DESCRIPCIÓN TÉCNICA -->
+      <div class="space-y-1 text-xs">
+        <strong class="text-slate-700 dark:text-slate-300">Descripción y Evidencia</strong>
+        <p id="modal-inc-desc" class="p-3 rounded bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-mono text-[11px] leading-relaxed break-words"></p>
+      </div>
+
+      <!-- FACTORES DE CORRELACIÓN -->
+      <div class="space-y-1 text-xs">
+        <strong class="text-slate-700 dark:text-slate-300">Factores Correlacionados por el Motor</strong>
+        <div id="modal-inc-reasons" class="flex flex-wrap gap-1.5 pt-1"></div>
+      </div>
+
+      <!-- ASIGNACIÓN DE RESPONSABLE -->
+      <div class="p-3 rounded bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="font-semibold text-slate-700 dark:text-slate-300">Responsable Asignado:</span>
+          <span id="modal-inc-responsible" class="ml-1 text-[#0784B7] font-medium">guardia_soc@sampol.com</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="modal-select-assignee" class="px-2 py-1 text-xs rounded bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+            <option value="guardia_soc@sampol.com">guardia_soc@sampol.com</option>
+            <option value="analista_l2@sampol.com">analista_l2@sampol.com</option>
+            <option value="director.ti@sampol.com">director.ti@sampol.com</option>
+          </select>
+          <button onclick="reassignCurrentIncident()" class="btn-sampol-secondary text-xs py-1 px-2.5">Asignar</button>
+        </div>
+      </div>
+
+      <!-- ACCIONES DE RESPUESTA -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <button id="modal-btn-ack" onclick="ackCurrentIncident()" class="btn-sampol-primary text-xs">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          <span>Reconocer Incidente (ACK)</span>
+        </button>
+        <button onclick="closeIncidentModal()" class="btn-sampol-secondary text-xs">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- =========================================================================
@@ -875,63 +1261,27 @@ def main():
     const ALERTS_DATA = {alerts_json};
     const SOAR_DATA = {soar_json};
     let NOTIFS_DATA = {notifs_json};
+    const METRICS_DATA = {metrics_json};
+
     let CURRENT_NOTIF_FILTER = 'all';
-
-    function initTheme() {{
-      const saved = localStorage.getItem('sampol_theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {{
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-        updateThemeIcon(true);
-      }} else {{
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-        updateThemeIcon(false);
-      }}
-    }}
-
-    function toggleTheme() {{
-      const isDark = document.documentElement.classList.contains('dark');
-      if (isDark) {{
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-        localStorage.setItem('sampol_theme', 'light');
-        updateThemeIcon(false);
-      }} else {{
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('sampol_theme', 'dark');
-        updateThemeIcon(true);
-      }}
-    }}
-
-    function updateThemeIcon(isDark) {{
-      const container = document.getElementById('theme-icon');
-      if (!container) return;
-      container.innerHTML = isDark 
-        ? '<i data-lucide="sun" class="w-4 h-4"></i>'
-        : '<i data-lucide="moon" class="w-4 h-4"></i>';
-      if (window.lucide) lucide.createIcons();
-    }}
-
-    function toggleSidebar() {{
-      const sb = document.getElementById('main-sidebar');
-      const bd = document.getElementById('sidebar-backdrop');
-      if (sb) sb.classList.toggle('-translate-x-full');
-      if (bd) bd.classList.toggle('hidden');
-    }}
+    let CURRENT_INC_FILTER = 'all';
+    let CURRENT_INC_VIEW = 'table';
+    let CURRENT_MODAL_INC_ID = null;
 
     const TAB_NAMES = {{
       'tab-resumen': 'Dashboard',
+      'tab-incidentes': 'Incidentes',
       'tab-dataset': 'Alertas',
-      'tab-notifications': 'Notificaciones',
       'tab-forense': 'Investigación',
-      'tab-soar': 'Respuesta',
+      'tab-notifications': 'Notificaciones',
       'tab-activos': 'Activos',
-      'tab-automations': 'Automatización',
+      'tab-usuarios': 'Usuarios',
+      'tab-soar': 'Respuesta',
+      'tab-automations': 'Automatizaciones',
+      'tab-informes': 'Informes',
       'tab-roi': 'Finanzas',
-      'tab-directrices': 'Directrices',
-      'tab-auditoria': 'Auditoría'
+      'tab-auditoria': 'Auditoría',
+      'tab-configuracion': 'Configuración'
     }};
 
     function switchTab(tabId) {{
@@ -955,111 +1305,337 @@ def main():
       if (window.lucide) lucide.createIcons();
     }}
 
+    function toggleSidebar() {{
+      const sb = document.getElementById('main-sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      if (!sb || !bd) return;
+      const isClosed = sb.classList.contains('-translate-x-full');
+      if (isClosed) {{
+        sb.classList.remove('-translate-x-full');
+        bd.classList.remove('hidden');
+      }} else {{
+        sb.classList.add('-translate-x-full');
+        bd.classList.add('hidden');
+      }}
+    }}
+
     function toggleBellDrawer() {{
       const d = document.getElementById('bell-drawer');
       if (!d) return;
       d.classList.toggle('hidden');
-      renderDrawerList();
+      if (!d.classList.contains('hidden')) {{
+        renderDrawerList();
+      }}
     }}
 
-    function renderDrawerList() {{
-      const c = document.getElementById('drawer-notifs-list');
-      if (!c) return;
-      const unack = (NOTIFS_DATA || []).filter(n => !n.acknowledged && (n.priority === 'P1' || n.priority === 'P2'));
-      if (!unack.length) {{
-        c.innerHTML = '<p class="text-slate-400 text-center py-4 text-xs">Sin avisos prioritarios pendientes.</p>';
-        return;
-      }}
-      c.innerHTML = unack.slice(0, 8).map(n => `
-        <div class="p-2.5 rounded border ${{n.priority === 'P1' ? 'border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20' : 'border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20'}} space-y-1">
-          <div class="flex items-center justify-between">
-            <span class="font-bold ${{n.priority === 'P1' ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'}} text-[11px]">${{n.priority}} · ${{n.incident_id || 'INC'}}</span>
-            <span class="text-[10px] text-slate-400">${{n.count || 1}} evento(s)</span>
-          </div>
-          <div class="font-medium text-slate-800 dark:text-white text-[11px] truncate">${{n.title || ''}}</div>
-          <button onclick="ackNotification(${{n.id}})" class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-medium border border-slate-200 dark:border-slate-700 w-full mt-1 cursor-pointer">Reconocer</button>
-        </div>
-      `).join('');
+    function toggleTheme() {{
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+    }}
+
+    function updateThemeIcon(isDark) {{
+      const el = document.getElementById('theme-icon');
+      if (!el) return;
+      el.innerHTML = isDark 
+        ? '<i data-lucide="sun" class="w-4 h-4"></i>' 
+        : '<i data-lucide="moon" class="w-4 h-4"></i>';
       if (window.lucide) lucide.createIcons();
     }}
 
-    function setNotifFilter(f) {{
-      CURRENT_NOTIF_FILTER = f;
-      document.querySelectorAll('[id^="btn-nf-"]').forEach(b => {{
-        b.className = 'px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-xs';
-      }});
-      const bActive = document.getElementById('btn-nf-' + f);
-      if (bActive) bActive.className = 'px-2.5 py-1 rounded bg-[#0784B7] text-white font-medium text-xs';
-      renderNotifsTable();
+    function initTheme() {{
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = saved === 'dark' || (!saved && prefersDark);
+      if (isDark) {{
+        document.documentElement.classList.add('dark');
+      }} else {{
+        document.documentElement.classList.remove('dark');
+      }}
+      updateThemeIcon(isDark);
     }}
 
-    function renderNotifsTable() {{
-      const searchEl = document.getElementById('notif-search');
-      const q = searchEl ? (searchEl.value || '').toLowerCase() : '';
-      const c = document.getElementById('notifs-container');
+    // RENDER: DASHBOARD INCIDENTES PRIORITARIOS
+    function renderDashboardPriorityIncidents() {{
+      const c = document.getElementById('dashboard-priority-incidents');
       if (!c) return;
-      
-      const filtered = (NOTIFS_DATA || []).filter(n => {{
-        const matchF = CURRENT_NOTIF_FILTER === 'all' || 
-                       (CURRENT_NOTIF_FILTER === 'unack' && !n.acknowledged) ||
-                       (n.priority === CURRENT_NOTIF_FILTER);
-        const matchQ = !q || (n.title || '').toLowerCase().includes(q) ||
-                             (n.incident_id || '').toLowerCase().includes(q) ||
-                             (n.affected_user || '').toLowerCase().includes(q);
-        return matchF && matchQ;
-      }});
-
-      if (!filtered.length) {{
-        c.innerHTML = '<div class="sampol-card p-6 text-center text-slate-400 text-xs">No se encontraron notificaciones con el filtro actual.</div>';
+      const priorities = (NOTIFS_DATA || []).filter(n => n.priority === 'P1' || (!n.acknowledged && n.priority === 'P2')).slice(0, 4);
+      if (!priorities.length) {{
+        c.innerHTML = '<div class="p-4 text-center text-xs text-slate-400">No hay incidentes críticos pendientes de atención.</div>';
         return;
       }}
-
-      c.innerHTML = filtered.map(n => {{
+      c.innerHTML = priorities.map(n => {{
         const isP1 = n.priority === 'P1';
-        const isP2 = n.priority === 'P2';
-        const isAck = !!n.acknowledged;
-        const colorBorder = isP1 ? 'border-rose-200 dark:border-rose-900 bg-rose-50/20 dark:bg-rose-950/10' : isP2 ? 'border-amber-200 dark:border-amber-900 bg-amber-50/20 dark:bg-amber-950/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111A24]';
-        const badgeColor = isP1 ? 'badge-critical' : isP2 ? 'badge-high' : 'badge-low';
-
-        const reasonsHtml = ((n.reasons || []).slice(0, 3)).map(r => `<span class="px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] border border-slate-200 dark:border-slate-700">${{r}}</span>`).join(' ');
-
         return `
-          <div class="p-3.5 rounded border ${{colorBorder}} space-y-2">
+          <div class="p-3 rounded-lg border ${{isP1 ? 'border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20' : 'border-amber-200 dark:border-amber-900 bg-amber-50/30 dark:bg-amber-950/20'}} space-y-2 text-xs">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center space-x-2">
-                <span class="${{badgeColor}}">${{n.priority}}</span>
-                <span class="font-mono text-xs font-semibold text-[#0784B7] dark:text-[#38BDF8]">${{n.incident_id || 'INC'}}</span>
-                <span class="text-xs text-slate-400">· ${{n.count || 1}} evento(s)</span>
-                <span class="text-xs text-slate-400">· Riesgo: <strong class="text-slate-700 dark:text-slate-200">${{n.risk_score || 75}}/100</strong></span>
+              <div class="flex items-center gap-2">
+                <span class="${{isP1 ? 'badge-critical' : 'badge-high'}} font-bold">${{n.priority}}</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">${{n.incident_id}}</span>
+                <span class="text-slate-400">·</span>
+                <span class="text-slate-500">${{n.count}} alertas agrupadas</span>
               </div>
-              <div class="flex items-center space-x-2">
-                <span class="text-xs ${{isAck ? 'text-emerald-600' : 'text-amber-600'}} font-medium">
-                  ${{isAck ? 'Reconocida (' + (n.acknowledged_by || 'Analista') + ')' : 'Pendiente'}}
-                </span>
-                <button onclick="ackNotification(${{n.id}})" ${{isAck ? 'disabled' : ''}} class="px-2.5 py-1 rounded text-xs ${{isAck ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'btn-sampol-primary cursor-pointer'}} transition">
-                  ${{isAck ? 'Reconocida' : 'Reconocer'}}
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-mono text-slate-500">${{n.last_event_at ? n.last_event_at.substring(11, 16) + ' UTC' : 'Reciente'}}</span>
+                <button onclick="openIncidentModal(${{n.id}})" class="btn-sampol-primary text-[11px] py-1 px-2.5">
+                  <span>Gestionar</span>
+                  <i data-lucide="arrow-right" class="w-3 h-3"></i>
                 </button>
               </div>
             </div>
-
-            <div class="text-xs font-semibold text-slate-900 dark:text-white">${{n.title || ''}}</div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">${{n.description || ''}}</p>
-
-            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
-              <span>Usuario: <strong class="text-slate-700 dark:text-slate-300 font-mono">${{n.affected_user || '-'}}</strong></span>
-              <span>Activo: <strong class="text-slate-700 dark:text-slate-300 font-mono">${{n.affected_asset || '-'}}</strong></span>
-              ${{reasonsHtml}}
+            <div class="font-semibold text-slate-800 dark:text-slate-200">${{n.title}}</div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+              <span><strong>Activo:</strong> ${{n.affected_asset || 'N/A'}}</span>
+              <span><strong>Usuario:</strong> ${{n.affected_user || 'N/A'}}</span>
+              <span><strong>Responsable:</strong> ${{n.acknowledged_by || 'Sin asignar'}}</span>
+              <span class="${{isP1 ? 'text-rose-600 font-semibold' : 'text-slate-500'}}">SLA: ${{isP1 ? '15m (Crítico)' : '60m'}}</span>
             </div>
           </div>
         `;
       }}).join('');
-
-      const p1Unack = (NOTIFS_DATA || []).filter(n => !n.acknowledged && n.priority === 'P1').length;
-      const bBadge = document.getElementById('bell-badge-count');
-      if (bBadge) bBadge.textContent = p1Unack;
-      const stP1 = document.getElementById('stat-p1-count');
-      if (stP1) stP1.textContent = p1Unack;
       if (window.lucide) lucide.createIcons();
+    }}
+
+    // RENDER: ALERTAS RECIENTES EN DASHBOARD
+    function renderDashboardRecentAlerts() {{
+      const tb = document.getElementById('tbl-recent-alerts');
+      if (!tb) return;
+      tb.innerHTML = (ALERTS_DATA || []).slice(0, 5).map(a => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+          <td class="font-mono text-slate-400 text-[10px] whitespace-nowrap">${{a.timestamp.substring(0, 16)}}</td>
+          <td class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-medium whitespace-nowrap">${{a.internal_id}}</td>
+          <td>
+            <span class="${{a.severity === 'CRITICA' ? 'badge-critical' : 'badge-high'}}">${{a.severity}}</span>
+          </td>
+          <td class="text-slate-700 dark:text-slate-300 font-medium">${{a.class}}</td>
+          <td class="font-mono text-slate-600 dark:text-slate-400">${{a.host || a.user || '-'}}</td>
+          <td class="font-mono text-xs text-slate-500 truncate max-w-xs">INC-CAMP-MORENO</td>
+        </tr>
+      `).join('');
+    }}
+
+    // GESTIÓN DE INCIDENTES (TABLA Y KANBAN)
+    function setIncidentView(view) {{
+      CURRENT_INC_VIEW = view;
+      const btnTable = document.getElementById('btn-view-table');
+      const btnKanban = document.getElementById('btn-view-kanban');
+      const vTable = document.getElementById('incidents-table-view');
+      const vKanban = document.getElementById('incidents-kanban-view');
+
+      if (view === 'table') {{
+        btnTable.className = 'px-3 py-1 text-xs font-medium rounded-l border border-slate-300 dark:border-slate-700 bg-[#0784B7] text-white';
+        btnKanban.className = 'px-3 py-1 text-xs font-medium rounded-r border border-l-0 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50';
+        vTable.classList.remove('hidden');
+        vKanban.classList.add('hidden');
+      }} else {{
+        btnTable.className = 'px-3 py-1 text-xs font-medium rounded-l border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50';
+        btnKanban.className = 'px-3 py-1 text-xs font-medium rounded-r border border-l-0 border-slate-300 dark:border-slate-700 bg-[#0784B7] text-white';
+        vTable.classList.add('hidden');
+        vKanban.classList.remove('hidden');
+        renderIncidentsKanban();
+      }}
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function setIncFilter(filter) {{
+      CURRENT_INC_FILTER = filter;
+      ['all', 'P1', 'P2', 'unack', 'investigating'].forEach(f => {{
+        const b = document.getElementById('btn-inc-' + f);
+        if (b) {{
+          b.className = f === filter
+            ? 'px-2.5 py-1 rounded bg-[#0784B7] text-white font-medium'
+            : 'px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50';
+        }}
+      }});
+      renderIncidentsTable();
+      if (CURRENT_INC_VIEW === 'kanban') renderIncidentsKanban();
+    }}
+
+    function renderIncidentsTable() {{
+      const q = (document.getElementById('inc-search') ? document.getElementById('inc-search').value : '').toLowerCase();
+      const tb = document.getElementById('tbl-incidents');
+      const cards = document.getElementById('cards-incidents');
+
+      const filtered = (NOTIFS_DATA || []).filter(n => {{
+        let matchF = true;
+        if (CURRENT_INC_FILTER === 'P1') matchF = n.priority === 'P1';
+        else if (CURRENT_INC_FILTER === 'P2') matchF = n.priority === 'P2';
+        else if (CURRENT_INC_FILTER === 'unack') matchF = !n.acknowledged;
+        else if (CURRENT_INC_FILTER === 'investigating') matchF = n.acknowledged;
+
+        const matchQ = !q || (n.incident_id && n.incident_id.toLowerCase().includes(q)) ||
+                             (n.title && n.title.toLowerCase().includes(q)) ||
+                             (n.affected_user && n.affected_user.toLowerCase().includes(q)) ||
+                             (n.affected_asset && n.affected_asset.toLowerCase().includes(q));
+        return matchF && matchQ;
+      }});
+
+      if (tb) {{
+        tb.innerHTML = filtered.map(n => {{
+          const isP1 = n.priority === 'P1';
+          const isP2 = n.priority === 'P2';
+          const badgeClass = isP1 ? 'badge-critical' : isP2 ? 'badge-high' : 'badge-low';
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+              <td class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-bold whitespace-nowrap">${{n.incident_id}}</td>
+              <td class="font-medium text-slate-900 dark:text-white max-w-xs truncate">${{n.title}}</td>
+              <td><span class="${{badgeClass}}">${{n.priority}}</span></td>
+              <td><span class="${{n.acknowledged ? 'badge-low' : 'badge-high'}}">${{n.acknowledged ? 'En Investigación' : 'Sin Acuse'}}</span></td>
+              <td class="font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">${{n.affected_asset || '-'}}</td>
+              <td class="font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">${{n.affected_user || '-'}}</td>
+              <td class="font-semibold text-slate-700 dark:text-slate-300">${{n.count}}</td>
+              <td class="text-slate-500 whitespace-nowrap">${{n.acknowledged_by || 'Sin asignar'}}</td>
+              <td>
+                <button onclick="openIncidentModal(${{n.id}})" class="btn-sampol-secondary text-[11px] py-1 px-2.5">
+                  Detalle
+                </button>
+              </td>
+            </tr>
+          `;
+        }}).join('');
+      }}
+
+      if (cards) {{
+        cards.innerHTML = filtered.map(n => {{
+          const isP1 = n.priority === 'P1';
+          const badgeClass = isP1 ? 'badge-critical' : 'badge-high';
+          return `
+            <div class="mobile-card space-y-2 text-xs">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-bold">${{n.incident_id}}</span>
+                <span class="${{badgeClass}}">${{n.priority}}</span>
+              </div>
+              <div class="font-semibold text-slate-900 dark:text-white">${{n.title}}</div>
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+                <span><strong>Activo:</strong> ${{n.affected_asset || '-'}}</span>
+                <span><strong>Usuario:</strong> ${{n.affected_user || '-'}}</span>
+                <span><strong>Alertas:</strong> ${{n.count}}</span>
+              </div>
+              <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] text-slate-400">Resp: ${{n.acknowledged_by || 'Sin asignar'}}</span>
+                <button onclick="openIncidentModal(${{n.id}})" class="btn-sampol-primary text-[11px] py-1 px-2">
+                  Gestionar
+                </button>
+              </div>
+            </div>
+          `;
+        }}).join('');
+      }}
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function renderIncidentsKanban() {{
+      const cols = {{
+        new: document.getElementById('kanban-col-new'),
+        investigating: document.getElementById('kanban-col-investigating'),
+        contained: document.getElementById('kanban-col-contained'),
+        resolved: document.getElementById('kanban-col-resolved')
+      }};
+      if (!cols.new) return;
+
+      const lists = {{ new: [], investigating: [], contained: [], resolved: [] }};
+
+      (NOTIFS_DATA || []).forEach(n => {{
+        if (!n.acknowledged) {{
+          lists.new.push(n);
+        }} else if (n.status === 'resolved' || n.status === 'cerrado') {{
+          lists.resolved.push(n);
+        }} else if (n.incident_id && (n.incident_id.includes('MORENO') || n.incident_id.includes('srv') || n.risk_score >= 90)) {{
+          lists.contained.push(n);
+        }} else {{
+          lists.investigating.push(n);
+        }}
+      }});
+
+      document.getElementById('kanban-count-new').textContent = lists.new.length;
+      document.getElementById('kanban-count-investigating').textContent = lists.investigating.length;
+      document.getElementById('kanban-count-contained').textContent = lists.contained.length;
+      document.getElementById('kanban-count-resolved').textContent = lists.resolved.length;
+
+      const renderCard = n => `
+        <div onclick="openIncidentModal(${{n.id}})" class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-sm hover:border-[#0784B7] cursor-pointer space-y-1.5 transition">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[10px] font-bold text-[#0784B7] dark:text-[#38BDF8]">${{n.incident_id}}</span>
+            <span class="${{n.priority === 'P1' ? 'badge-critical' : 'badge-high'}} text-[9px]">${{n.priority}}</span>
+          </div>
+          <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs line-clamp-2">${{n.title}}</div>
+          <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60">
+            <span>${{n.affected_user || n.affected_asset || '-'}}</span>
+            <span>${{n.count}} al.</span>
+          </div>
+        </div>
+      `;
+
+      cols.new.innerHTML = lists.new.map(renderCard).join('') || '<div class="text-center py-4 text-[11px] text-slate-400">Sin nuevos casos</div>';
+      cols.investigating.innerHTML = lists.investigating.map(renderCard).join('') || '<div class="text-center py-4 text-[11px] text-slate-400">Sin casos activos</div>';
+      cols.contained.innerHTML = lists.contained.map(renderCard).join('') || '<div class="text-center py-4 text-[11px] text-slate-400">Sin contenciones</div>';
+      cols.resolved.innerHTML = lists.resolved.map(renderCard).join('') || '<div class="text-center py-4 text-[11px] text-slate-400">Sin resolver</div>';
+    }}
+
+    // MODAL DE DETALLE DE INCIDENTE
+    function openIncidentModal(id) {{
+      const inc = (NOTIFS_DATA || []).find(n => n.id === id);
+      if (!inc) return;
+      CURRENT_MODAL_INC_ID = id;
+
+      document.getElementById('modal-inc-id').textContent = inc.incident_id;
+      document.getElementById('modal-inc-title').textContent = inc.title;
+      document.getElementById('modal-inc-priority').textContent = inc.priority;
+      document.getElementById('modal-inc-priority').className = inc.priority === 'P1' ? 'badge-critical' : 'badge-high';
+      document.getElementById('modal-inc-status').textContent = inc.acknowledged ? 'En Investigación' : 'Sin Acuse';
+      document.getElementById('modal-inc-status').className = inc.acknowledged ? 'badge-low' : 'badge-high';
+      document.getElementById('modal-inc-asset').textContent = inc.affected_asset || 'Infraestructura General';
+      document.getElementById('modal-inc-user').textContent = inc.affected_user || 'Sin cuenta individual';
+      document.getElementById('modal-inc-count').textContent = inc.count + ' eventos consolidados';
+      document.getElementById('modal-inc-score').textContent = (inc.risk_score || 85) + ' / 100';
+      document.getElementById('modal-inc-desc').textContent = inc.description || 'Sin descripción adicional.';
+      document.getElementById('modal-inc-responsible').textContent = inc.acknowledged_by || 'Sin asignar';
+
+      const reasonsContainer = document.getElementById('modal-inc-reasons');
+      reasonsContainer.innerHTML = (inc.reasons || []).map(r => `
+        <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] border border-slate-200 dark:border-slate-700">
+          ${{r}}
+        </span>
+      `).join('') || '<span class="text-slate-400 text-[10px]">Sin factores adicionales</span>';
+
+      const btnAck = document.getElementById('modal-btn-ack');
+      if (btnAck) {{
+        btnAck.innerHTML = inc.acknowledged
+          ? '<i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>Acusado por ' + (inc.acknowledged_by || 'guardia') + '</span>'
+          : '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Reconocer Incidente (ACK)</span>';
+      }}
+
+      const modal = document.getElementById('incident-modal');
+      modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function closeIncidentModal() {{
+      const modal = document.getElementById('incident-modal');
+      if (modal) modal.classList.add('hidden');
+      CURRENT_MODAL_INC_ID = null;
+    }}
+
+    function ackCurrentIncident() {{
+      if (!CURRENT_MODAL_INC_ID) return;
+      ackNotification(CURRENT_MODAL_INC_ID);
+      openIncidentModal(CURRENT_MODAL_INC_ID);
+    }}
+
+    function reassignCurrentIncident() {{
+      if (!CURRENT_MODAL_INC_ID) return;
+      const sel = document.getElementById('modal-select-assignee');
+      const val = sel ? sel.value : 'guardia_soc@sampol.com';
+      NOTIFS_DATA = (NOTIFS_DATA || []).map(n => {{
+        if (n.id === CURRENT_MODAL_INC_ID) {{
+          return {{ ...n, acknowledged: true, acknowledged_by: val, status: 'investigating' }};
+        }}
+        return n;
+      }});
+      renderIncidentsTable();
+      renderDashboardPriorityIncidents();
+      renderNotifsTable();
+      openIncidentModal(CURRENT_MODAL_INC_ID);
     }}
 
     function ackNotification(id) {{
@@ -1071,6 +1647,122 @@ def main():
       }});
       renderNotifsTable();
       renderDrawerList();
+      renderIncidentsTable();
+      renderDashboardPriorityIncidents();
+    }}
+
+    function renderDrawerList() {{
+      const c = document.getElementById('drawer-notifs-list');
+      if (!c) return;
+      const unack = (NOTIFS_DATA || []).filter(n => !n.acknowledged && (n.priority === 'P1' || n.priority === 'P2'));
+      if (!unack.length) {{
+        c.innerHTML = '<p class="text-slate-400 text-center py-4">No hay avisos prioritarios pendientes.</p>';
+        return;
+      }}
+      c.innerHTML = unack.slice(0, 8).map(n => `
+        <div class="p-2.5 rounded border ${{n.priority === 'P1' ? 'border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20' : 'border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20'}} space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 dark:text-slate-100">${{n.incident_id}}</span>
+            <span class="${{n.priority === 'P1' ? 'badge-critical' : 'badge-high'}} font-bold">${{n.priority}}</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-300 text-[11px] line-clamp-2">${{n.title}}</p>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[10px] text-slate-400">${{n.count}} alertas</span>
+            <button onclick="ackNotification(${{n.id}})" class="text-[10px] text-[#0784B7] dark:text-[#38BDF8] font-bold hover:underline">
+              Acusar
+            </button>
+          </div>
+        </div>
+      `).join('');
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function setNotifFilter(f) {{
+      CURRENT_NOTIF_FILTER = f;
+      ['all', 'P1', 'P2', 'unack'].forEach(id => {{
+        const btn = document.getElementById('btn-nf-' + id);
+        if (btn) {{
+          btn.className = (id === f) 
+            ? 'px-2.5 py-1 rounded bg-[#0784B7] text-white font-medium'
+            : 'px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50';
+        }}
+      }});
+      renderNotifsTable();
+    }}
+
+    function renderNotifsTable() {{
+      const q = (document.getElementById('notif-search') ? document.getElementById('notif-search').value : '').toLowerCase();
+      const c = document.getElementById('notifs-container');
+      if (!c) return;
+
+      const filtered = (NOTIFS_DATA || []).filter(n => {{
+        const matchF = CURRENT_NOTIF_FILTER === 'all' || 
+                       (CURRENT_NOTIF_FILTER === 'unack' && !n.acknowledged) ||
+                       (n.priority === CURRENT_NOTIF_FILTER);
+        const matchQ = !q || (n.incident_id && n.incident_id.toLowerCase().includes(q)) || 
+                             (n.title && n.title.toLowerCase().includes(q)) ||
+                             (n.affected_user && n.affected_user.toLowerCase().includes(q));
+        return matchF && matchQ;
+      }});
+
+      if (!filtered.length) {{
+        c.innerHTML = '<div class="p-8 text-center text-slate-400 bg-white dark:bg-[#111A24] rounded-lg border border-slate-200 dark:border-slate-800 text-xs">No se encontraron notificaciones.</div>';
+        return;
+      }}
+
+      c.innerHTML = filtered.map(n => {{
+        const isP1 = n.priority === 'P1';
+        const isP2 = n.priority === 'P2';
+        const cardBorder = isP1 
+          ? 'border-l-4 border-l-[#DC2626] border-slate-200 dark:border-slate-800' 
+          : isP2 
+          ? 'border-l-4 border-l-[#EA580C] border-slate-200 dark:border-slate-800' 
+          : 'border-l-4 border-l-[#16A34A] border-slate-200 dark:border-slate-800';
+        const badgeColor = isP1 ? 'badge-critical' : isP2 ? 'badge-high' : 'badge-low';
+
+        const reasonsHtml = ((n.reasons || []).slice(0, 3)).map(r => `<span class="px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] border border-slate-200 dark:border-slate-700">${{r}}</span>`).join(' ');
+
+        return `
+          <div class="sampol-card p-4 ${{cardBorder}} space-y-2 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="${{badgeColor}}">${{n.priority}}</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">${{n.incident_id}}</span>
+                <span class="text-slate-400">·</span>
+                <span class="text-slate-500">${{n.count}} alertas agrupadas</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono text-slate-400">${{n.last_event_at ? n.last_event_at.substring(0, 16) : '2026-11-03'}}</span>
+                ${{n.acknowledged 
+                  ? '<span class="text-[10px] text-emerald-600 font-medium">Acusado por ' + (n.acknowledged_by || 'guardia') + '</span>'
+                  : '<button onclick="ackNotification(' + n.id + ')" class="btn-sampol-primary text-[10px] py-1 px-2.5">Reconocer</button>'}}
+              </div>
+            </div>
+
+            <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs">${{n.title}}</div>
+            <p class="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">${{n.description}}</p>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
+              <div class="flex items-center space-x-3">
+                <span>Activo: <strong class="text-slate-600 dark:text-slate-300 font-mono">${{n.affected_asset || 'N/A'}}</strong></span>
+                <span>Usuario: <strong class="text-slate-600 dark:text-slate-300 font-mono">${{n.affected_user || 'N/A'}}</strong></span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1">
+                ${{reasonsHtml}}
+              </div>
+            </div>
+          </div>
+        `;
+      }}).join('');
+
+      const p1Unack = (NOTIFS_DATA || []).filter(n => n.priority === 'P1' && !n.acknowledged).length;
+      const bBadge = document.getElementById('bell-badge-count');
+      if (bBadge) bBadge.textContent = p1Unack;
+      const stP1 = document.getElementById('stat-p1-count');
+      if (stP1) stP1.textContent = p1Unack;
+      const stUnack = document.getElementById('stat-unack-dashboard');
+      if (stUnack) stUnack.textContent = (NOTIFS_DATA || []).filter(n => !n.acknowledged).length;
+      if (window.lucide) lucide.createIcons();
     }}
 
     function runScenarioA() {{
@@ -1092,6 +1784,8 @@ def main():
         reasons: ['Ráfaga 5.000 eventos correlacionados', 'Reducción fatiga: 99.98%']
       }});
       renderNotifsTable();
+      renderDashboardPriorityIncidents();
+      renderIncidentsTable();
     }}
 
     function runScenarioB() {{
@@ -1107,6 +1801,8 @@ def main():
         found.reasons.unshift('Escalada Crítica: Precursor Ransomware');
       }}
       renderNotifsTable();
+      renderDashboardPriorityIncidents();
+      renderIncidentsTable();
     }}
 
     function runScenarioC() {{
@@ -1124,16 +1820,19 @@ def main():
     function handleGlobalSearch() {{
       const q = (document.getElementById('global-search').value || '').toLowerCase();
       if (!q) return;
-      switchTab('tab-dataset');
-      const inputAlert = document.getElementById('alert-search');
-      if (inputAlert) {{
-        inputAlert.value = q;
-        filterAlerts();
+      switchTab('tab-incidentes');
+      const inputInc = document.getElementById('inc-search');
+      if (inputInc) {{
+        inputInc.value = q;
+        renderIncidentsTable();
       }}
     }}
 
     window.addEventListener('DOMContentLoaded', () => {{
       initTheme();
+      renderDashboardPriorityIncidents();
+      renderDashboardRecentAlerts();
+      renderIncidentsTable();
       renderNotifsTable();
       renderDrawerList();
       calcROI();
@@ -1142,8 +1841,8 @@ def main():
       if (tbAlerts) {{
         tbAlerts.innerHTML = (ALERTS_DATA || []).slice(0, 100).map(a => `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-            <td class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-medium">${{a.internal_id}}</td>
-            <td class="text-slate-400 font-mono text-[10px]">${{a.timestamp.substring(0, 16)}}</td>
+            <td class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-medium whitespace-nowrap">${{a.internal_id}}</td>
+            <td class="text-slate-400 font-mono text-[10px] whitespace-nowrap">${{a.timestamp.substring(0, 16)}}</td>
             <td>
               <span class="${{a.severity === 'CRITICA' ? 'badge-critical' : 'badge-high'}}">${{a.severity}}</span>
             </td>
@@ -1155,17 +1854,61 @@ def main():
         `).join('');
       }}
 
+      const cAlerts = document.getElementById('cards-alerts');
+      if (cAlerts) {{
+        cAlerts.innerHTML = (ALERTS_DATA || []).slice(0, 100).map(a => `
+          <div class="mobile-card space-y-2 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-bold text-xs">${{a.internal_id}}</span>
+              <span class="${{a.severity === 'CRITICA' ? 'badge-critical' : 'badge-high'}}">${{a.severity}}</span>
+            </div>
+            <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs">${{a.class}}</div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+              <span class="inline-flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i> ${{a.user || 'N/A'}}</span>
+              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${{a.site || 'Palma'}}</span>
+              <span class="inline-flex items-center gap-1 font-mono"><i data-lucide="clock" class="w-3 h-3"></i> ${{a.timestamp.substring(0, 16)}}</span>
+            </div>
+            <details class="text-[11px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-slate-100 dark:border-slate-800">
+              <summary class="cursor-pointer text-[#0784B7] dark:text-[#38BDF8] font-medium hover:underline">Ver detalles técnicos</summary>
+              <div class="mt-1.5 p-2 rounded bg-slate-50 dark:bg-slate-800/80 font-mono text-[10px] break-all text-slate-700 dark:text-slate-300">
+                ${{a.desc || a.category}}
+              </div>
+            </details>
+          </div>
+        `).join('');
+      }}
+
       const tbSoar = document.getElementById('tbl-soar-actions');
       if (tbSoar) {{
         tbSoar.innerHTML = (SOAR_DATA || []).slice(0, 50).map(s => `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-            <td class="font-mono text-slate-500 font-medium">#${{s.id}}</td>
-            <td class="font-medium text-slate-900 dark:text-white">${{s.action}}</td>
-            <td class="font-mono text-[#0784B7] dark:text-[#38BDF8]">${{s.target}}</td>
+            <td class="font-mono text-slate-500 font-medium whitespace-nowrap">#${{s.id}}</td>
+            <td class="font-medium text-slate-900 dark:text-white whitespace-nowrap">${{s.action}}</td>
+            <td class="font-mono text-[#0784B7] dark:text-[#38BDF8] whitespace-nowrap">${{s.target}}</td>
             <td class="text-slate-500">${{s.trigger}}</td>
             <td><span class="badge-low">${{s.status}}</span></td>
             <td class="text-slate-500 dark:text-slate-400 truncate max-w-sm">${{s.reason}}</td>
           </tr>
+        `).join('');
+      }}
+
+      const cSoar = document.getElementById('cards-soar');
+      if (cSoar) {{
+        cSoar.innerHTML = (SOAR_DATA || []).slice(0, 50).map(s => `
+          <div class="mobile-card space-y-1.5 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-slate-500 font-bold">Orden #${{s.id}}</span>
+              <span class="badge-low">${{s.status}}</span>
+            </div>
+            <div class="font-semibold text-slate-900 dark:text-white flex flex-wrap items-center gap-1.5">
+              <span>${{s.action}}</span>
+              <span class="font-mono text-[#0784B7] dark:text-[#38BDF8]">${{s.target}}</span>
+            </div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">
+              <span class="font-medium text-slate-700 dark:text-slate-300">Disparador:</span> ${{s.trigger}}
+            </div>
+            <p class="text-[11px] text-slate-600 dark:text-slate-300 break-words mt-1">${{s.reason}}</p>
+          </div>
         `).join('');
       }}
 
@@ -1229,6 +1972,10 @@ def main():
       rows.forEach(r => {{
         r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
       }});
+      const cards = document.querySelectorAll('#cards-alerts > div');
+      cards.forEach(c => {{
+        c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
+      }});
     }}
 
     function calcROI() {{
@@ -1276,13 +2023,12 @@ def main():
     }}
   </script>
 </body>
-</html>
-"""
+</html>"""
 
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(html_content)
 
-    print('index.html generado exitosamente con el diseño refinado Lucide y 0 emojis!')
+    print("index.html generado exitosamente con el nuevo diseño centrado en INCIDENTES!")
 
 if __name__ == '__main__':
     main()
