@@ -19,6 +19,15 @@ def main():
     p3_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P3')
     p4_count = sum(1 for n in data.get('notifications', []) if n.get('priority') == 'P4')
     unack_count = sum(1 for n in data.get('notifications', []) if not n.get('acknowledged'))
+    crit_alerts = sum(1 for a in data.get('alerts', []) if a.get('severity') == 'CRITICA')
+    high_alerts = sum(1 for a in data.get('alerts', []) if a.get('severity') == 'ALTA')
+    med_alerts = sum(1 for a in data.get('alerts', []) if a.get('severity') == 'MEDIA')
+    low_alerts = sum(1 for a in data.get('alerts', []) if a.get('severity') == 'BAJA')
+    med_low_alerts = med_alerts + low_alerts
+    crit_pct = round((crit_alerts / total_alerts) * 100, 1) if total_alerts else 0
+    high_pct = round((high_alerts / total_alerts) * 100, 1) if total_alerts else 0
+    med_pct = round((med_alerts / total_alerts) * 100, 1) if total_alerts else 0
+    low_pct = round((low_alerts / total_alerts) * 100, 1) if total_alerts else 0
 
     html_content = f"""<!DOCTYPE html>
 <html lang="es" class="light">
@@ -265,23 +274,21 @@ def main():
       <!-- =====================================================================
            TAB 1: DASHBOARD OPERATIVO (CENTRADÍSIMO EN INCIDENTES)
            ===================================================================== -->
-      <section id="tab-resumen" class="tab-content min-w-0 w-full space-y-5">
+      <section id="tab-resumen" class="tab-content min-w-0 w-full space-y-6">
 
         <!-- CABECERA DE OPERACIONES -->
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Estado de seguridad y gestión de incidentes en tiempo real.</p>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Centro de Operaciones SOC</h1>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-800">En Vivo</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Triaje pericial de alertas, monitorización de incidentes y respuesta SOAR en tiempo real.</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <select class="px-2.5 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:border-[#0784B7]">
-              <option>Hoy (Últimas 24h)</option>
-              <option>Últimos 7 días</option>
-              <option>Mes actual</option>
-            </select>
-            <span class="text-[11px] px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-medium flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              alertas-soc-1 · En vivo
+            <span class="text-[11px] px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              93 Alertas Ingeridas
             </span>
             <button onclick="location.reload()" class="btn-sampol-secondary text-xs" title="Actualizar datos">
               <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
@@ -290,150 +297,221 @@ def main():
           </div>
         </div>
 
-        <!-- 1. BLOQUE PRINCIPAL: INCIDENTES PRIORITARIOS (ATENCIÓN INMEDIATA) -->
-        <div class="sampol-card p-4 space-y-3 border-l-4 border-l-[#DC2626]">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
-            <div class="flex items-center gap-2">
-              <i data-lucide="siren" class="w-4 h-4 text-rose-600"></i>
-              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Incidentes Prioritarios (Atención Requerida)</h2>
-              <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-800">{p1_count} Críticos P1</span>
-            </div>
-            <button onclick="switchTab('tab-incidentes')" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline flex items-center gap-1">
-              Ver todos los incidentes ({notif_count}) <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-          
-          <div id="dashboard-priority-incidents" class="space-y-2.5">
-            <!-- Inyección JS con incidentes prioritarios -->
-          </div>
-        </div>
-
-        <!-- 2. SEGUNDO BLOQUE: INDICADORES OPERATIVOS COMPACTOS (CLICABLES) -->
+        <!-- 1. VALORES PRINCIPALES (TOP KPIS) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
 
-          <div onclick="switchTab('tab-incidentes'); setIncFilter('all');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Incidentes Abiertos</div>
-            <div class="text-xl font-bold text-slate-900 dark:text-white mt-0.5">{notif_count}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">En supervisión</div>
+          <div onclick="filterDashboardBySeverity('all')" class="sampol-card p-3.5 cursor-pointer hover:border-[#0784B7] transition group">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Total Alertas</span>
+              <i data-lucide="shield" class="w-4 h-4 text-[#0784B7] opacity-80"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{total_alerts}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-medium">100% Taxonomía INCIBE</div>
           </div>
 
-          <div onclick="switchTab('tab-incidentes'); setIncFilter('P1');" class="sampol-card p-3 cursor-pointer hover:border-rose-400 transition bg-rose-50/20 dark:bg-rose-950/10">
-            <div class="text-[11px] font-medium text-rose-600 dark:text-rose-400">Críticos P1</div>
-            <div class="text-xl font-bold text-rose-600 dark:text-rose-400 mt-0.5">{p1_count}</div>
-            <div class="text-[10px] text-rose-500 mt-0.5">SLA 15 minutos</div>
+          <div onclick="filterDashboardBySeverity('CRITICA')" class="sampol-card p-3.5 cursor-pointer hover:border-rose-500 transition border-l-4 border-l-[#DC2626] bg-rose-50/25 dark:bg-rose-950/15">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-rose-600 dark:text-rose-400">Críticas (P1)</span>
+              <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+            </div>
+            <div class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">{crit_alerts}</div>
+            <div class="text-[10px] text-rose-500 mt-0.5 font-medium">SLA Inmediato &lt; 15m</div>
           </div>
 
-          <div onclick="switchTab('tab-incidentes'); setIncFilter('unack');" class="sampol-card p-3 cursor-pointer hover:border-amber-400 transition">
-            <div class="text-[11px] font-medium text-amber-600 dark:text-amber-400">Sin Reconocer</div>
-            <div id="stat-unack-dashboard" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-0.5">{unack_count}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Requieren acuse</div>
+          <div onclick="filterDashboardBySeverity('ALTA')" class="sampol-card p-3.5 cursor-pointer hover:border-orange-500 transition border-l-4 border-l-[#EA580C] bg-orange-50/25 dark:bg-orange-950/15">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-orange-600 dark:text-orange-400">Altas (P2)</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-orange-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">{high_alerts}</div>
+            <div class="text-[10px] text-orange-500 mt-0.5 font-medium">SLA Prioritario &lt; 1h</div>
           </div>
 
-          <div onclick="switchTab('tab-incidentes'); setIncFilter('unassigned');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Sin Responsable</div>
-            <div class="text-xl font-bold text-slate-700 dark:text-slate-300 mt-0.5">4</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Pendiente asignación</div>
+          <div onclick="filterDashboardBySeverity('MEDIA')" class="sampol-card p-3.5 cursor-pointer hover:border-amber-500 transition border-l-4 border-l-[#D97706] bg-amber-50/20 dark:bg-amber-950/15">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Medias / Bajas</span>
+              <i data-lucide="info" class="w-4 h-4 text-amber-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">{med_low_alerts}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-medium">{med_alerts} Medias · {low_alerts} Bajas</div>
           </div>
 
-          <div onclick="switchTab('tab-incidentes'); setIncFilter('investigating');" class="sampol-card p-3 cursor-pointer hover:border-[#0784B7] transition">
-            <div class="text-[11px] font-medium text-[#0784B7] dark:text-[#38BDF8]">En Investigación</div>
-            <div class="text-xl font-bold text-[#0784B7] dark:text-[#38BDF8] mt-0.5">38</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Guardia activa</div>
+          <div onclick="switchTab('tab-soar')" class="sampol-card p-3.5 cursor-pointer hover:border-emerald-500 transition border-l-4 border-l-[#16A34A] bg-emerald-50/20 dark:bg-emerald-950/15">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Contención SOAR</span>
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{soar_count}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Aislamientos ejecutados</div>
           </div>
 
-          <div onclick="switchTab('tab-soar')" class="sampol-card p-3 cursor-pointer hover:border-emerald-400 transition">
-            <div class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Contención SOAR</div>
-            <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{soar_count}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">Acciones ejecutadas</div>
+          <div onclick="switchTab('tab-roi')" class="sampol-card p-3.5 cursor-pointer hover:border-[#0784B7] transition border-l-4 border-l-[#0784B7]">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-[#0784B7] dark:text-[#38BDF8]">Reducción Ruido</span>
+              <i data-lucide="sparkles" class="w-4 h-4 text-[#0784B7]"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 dark:text-white mt-1">65%</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Consolidación heurística</div>
           </div>
 
         </div>
 
-        <!-- 3. TERCER BLOQUE: ALERTAS RECIENTES RELEVANTES -->
-        <div class="sampol-card p-4 space-y-3">
-          <div class="flex items-center justify-between">
+        <!-- 2. GRÁFICO DE CANTIDAD DE ALERTAS SEGÚN LA GRAVEDAD -->
+        <div class="sampol-card p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
-              <h2 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Alertas Recientes Relevantes</h2>
-              <p class="text-[11px] text-slate-400">Eventos de severidad crítica y alta recibidos por los sensores del SOC.</p>
+              <div class="flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-[#0784B7] dark:text-[#38BDF8]"></i>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Distribución de Alertas según Gravedad</h2>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Volumen cuantitativo de alertas catalogadas por criticidad e impacto operacional ({total_alerts} en total).</p>
             </div>
-            <button onclick="switchTab('tab-dataset')" class="text-xs text-[#0784B7] dark:text-[#38BDF8] font-semibold hover:underline flex items-center gap-1">
-              Ver centro de alertas ({total_alerts}) <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 font-mono">Taxonomía INCIBE v2.0</span>
+            </div>
           </div>
 
-          <div class="overflow-x-auto min-w-0 w-full">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+            <!-- CANVAS GRÁFICO DE BARRAS -->
+            <div class="lg:col-span-7 min-w-0">
+              <div class="h-64 sm:h-72 w-full min-w-0">
+                <canvas id="chart-dashboard-severity"></canvas>
+              </div>
+            </div>
+
+            <!-- TARJETAS INTERACTIVAS DE GRAVEDAD CON FILTRADO RÁPIDO -->
+            <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
+              
+              <div onclick="filterDashboardBySeverity('CRITICA')" class="p-3 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 hover:border-rose-500 hover:shadow-sm cursor-pointer transition space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#DC2626]"></span>
+                    <span class="font-bold text-xs text-rose-700 dark:text-rose-400">Crítica (P1)</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-rose-700 dark:text-rose-400">{crit_alerts} ({crit_pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-[#DC2626] h-full" style="width: {crit_pct}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                  <span>Precursor Ransomware, C2, Exfiltración</span>
+                  <span class="text-[10px] text-rose-600 font-semibold hover:underline">Filtrar →</span>
+                </div>
+              </div>
+
+              <div onclick="filterDashboardBySeverity('ALTA')" class="p-3 rounded-lg border border-orange-200 dark:border-orange-900/60 bg-orange-50/40 dark:bg-orange-950/20 hover:border-orange-500 hover:shadow-sm cursor-pointer transition space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#EA580C]"></span>
+                    <span class="font-bold text-xs text-orange-700 dark:text-orange-400">Alta (P2)</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">{high_alerts} ({high_pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-[#EA580C] h-full" style="width: {high_pct}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                  <span>Password Spray, Mov. Lateral, Privilegios</span>
+                  <span class="text-[10px] text-orange-600 font-semibold hover:underline">Filtrar →</span>
+                </div>
+              </div>
+
+              <div onclick="filterDashboardBySeverity('MEDIA')" class="p-3 rounded-lg border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 hover:border-amber-500 hover:shadow-sm cursor-pointer transition space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#D97706]"></span>
+                    <span class="font-bold text-xs text-amber-700 dark:text-amber-400">Media (P3)</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-amber-700 dark:text-amber-400">{med_alerts} ({med_pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-[#D97706] h-full" style="width: {med_pct}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                  <span>Phishing genérico, escaneos externos</span>
+                  <span class="text-[10px] text-amber-600 font-semibold hover:underline">Filtrar →</span>
+                </div>
+              </div>
+
+              <div onclick="filterDashboardBySeverity('BAJA')" class="p-3 rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 hover:border-emerald-500 hover:shadow-sm cursor-pointer transition space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#16A34A]"></span>
+                    <span class="font-bold text-xs text-emerald-700 dark:text-emerald-400">Baja (P4)</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400">{low_alerts} ({low_pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-[#16A34A] h-full" style="width: {low_pct}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                  <span>Trazas rutinarias, telemetría informativa</span>
+                  <span class="text-[10px] text-emerald-600 font-semibold hover:underline">Filtrar →</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. PANEL DE GESTIÓN Y TRIAJE DE ALERTAS -->
+        <div class="sampol-card p-4 sm:p-5 space-y-4">
+          <!-- CABECERA Y BUSCADOR -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="sliders-horizontal" class="w-5 h-5 text-[#0784B7] dark:text-[#38BDF8]"></i>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Panel para Gestión y Triaje de Alertas</h2>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestione el triaje pericial, modifique estados y aplique contención SOAR en cada alerta.</p>
+            </div>
+            
+            <div class="w-full sm:w-80 min-w-0">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="dash-alert-search" oninput="filterDashboardAlertsTable()" placeholder="Buscar por código, usuario, host, IP..." class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:border-[#0784B7] text-slate-900 dark:text-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES DE FILTRO RÁPIDO -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex flex-wrap items-center gap-1.5 text-xs" id="dash-severity-filters">
+              <button onclick="filterDashboardBySeverity('all')" id="dash-filter-all" class="px-3 py-1 rounded-md text-xs font-semibold bg-[#0784B7] text-white">Todas ({total_alerts})</button>
+              <button onclick="filterDashboardBySeverity('CRITICA')" id="dash-filter-CRITICA" class="px-3 py-1 rounded-md text-xs font-medium bg-white dark:bg-slate-800 text-rose-600 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-950/30">Críticas ({crit_alerts})</button>
+              <button onclick="filterDashboardBySeverity('ALTA')" id="dash-filter-ALTA" class="px-3 py-1 rounded-md text-xs font-medium bg-white dark:bg-slate-800 text-orange-600 border border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-orange-950/30">Altas ({high_alerts})</button>
+              <button onclick="filterDashboardBySeverity('MEDIA')" id="dash-filter-MEDIA" class="px-3 py-1 rounded-md text-xs font-medium bg-white dark:bg-slate-800 text-amber-600 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-950/30">Medias ({med_alerts})</button>
+              <button onclick="filterDashboardBySeverity('BAJA')" id="dash-filter-BAJA" class="px-3 py-1 rounded-md text-xs font-medium bg-white dark:bg-slate-800 text-emerald-600 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">Bajas ({low_alerts})</button>
+            </div>
+
+            <div class="text-xs">
+              <span id="dash-filtered-count" class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Mostrando {total_alerts} de {total_alerts}</span>
+            </div>
+          </div>
+
+          <!-- TABLA INTERACTIVA DE GESTIÓN -->
+          <div class="hidden md:block overflow-x-auto max-h-[620px] min-w-0 w-full rounded-lg border border-slate-200 dark:border-slate-800">
             <table class="sampol-table min-w-full">
-              <thead>
+              <thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900 shadow-sm">
                 <tr>
-                  <th>Fecha (UTC)</th>
-                  <th>Código</th>
-                  <th>Gravedad</th>
-                  <th>Categoría INCIBE</th>
-                  <th>Activo / Usuario</th>
-                  <th>Incidente Asociado</th>
+                  <th class="py-2.5 px-3">Código</th>
+                  <th class="py-2.5 px-3">Fecha (UTC)</th>
+                  <th class="py-2.5 px-3">Gravedad</th>
+                  <th class="py-2.5 px-3">Clase INCIBE</th>
+                  <th class="py-2.5 px-3">Activo / Usuario / IP</th>
+                  <th class="py-2.5 px-3">Estado</th>
+                  <th class="py-2.5 px-3 text-right">Gestión</th>
                 </tr>
               </thead>
-              <tbody id="tbl-recent-alerts">
-                <!-- Inyección JS con las 5 alertas más críticas -->
+              <tbody id="tbl-dashboard-alerts" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Inyección JS -->
               </tbody>
             </table>
           </div>
-        </div>
 
-        <!-- 4. CUARTO BLOQUE: ACTIVIDAD RECIENTE DEL SOC -->
-        <div class="sampol-card p-4 space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <h2 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Actividad del SOC (Auditoría en Vivo)</h2>
-            <span class="text-[10px] font-mono text-slate-400">Trazabilidad RFC 822</span>
-          </div>
-          <div class="space-y-2 text-xs">
-            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
-              <div class="space-y-0.5">
-                <span class="font-semibold text-rose-600 dark:text-rose-400">Incidente P1 Escalado a Dirección:</span>
-                <span class="text-slate-600 dark:text-slate-300">INC-CAMP-MORENO notificado a dirti@sampol.com conforme a SLA de 15m.</span>
-                <div class="text-[10px] text-slate-400 font-mono">Actor: SLA_DAEMON · Ref: SOL-B-014</div>
-              </div>
-              <span class="font-mono text-[10px] text-slate-400 shrink-0">19:14 UTC</span>
-            </div>
-            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
-              <div class="space-y-0.5">
-                <span class="font-semibold text-purple-600 dark:text-purple-400">Acción SOAR Ejecutada:</span>
-                <span class="text-slate-600 dark:text-slate-300">Aislamiento autónomo de cuenta 'dmoreno@sampol.com' bajo Directriz 1.</span>
-                <div class="text-[10px] text-slate-400 font-mono">Actor: AUTOBLOCK_ENGINE · HTTP 201 OK</div>
-              </div>
-              <span class="font-mono text-[10px] text-slate-400 shrink-0">19:06 UTC</span>
-            </div>
-            <div class="p-2 rounded bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-3">
-              <div class="space-y-0.5">
-                <span class="font-semibold text-[#0784B7] dark:text-[#38BDF8]">Alerta Ingerida:</span>
-                <span class="text-slate-600 dark:text-slate-300">Sensor Outlook procesó mensaje PHISH-EXT-036 con hash forense SHA-256.</span>
-                <div class="text-[10px] text-slate-400 font-mono">Actor: GRAPH_DAEMON · Buzón corporativo</div>
-              </div>
-              <span class="font-mono text-[10px] text-slate-400 shrink-0">18:05 UTC</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. QUINTO BLOQUE: ESTADO GENERAL (GRÁFICOS SECUNDARIOS) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0 w-full">
-          <div class="sampol-card p-4 lg:col-span-2 min-w-0">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías INCIBE</h2>
-              <span class="text-[11px] text-slate-400">10 clases oficiales</span>
-            </div>
-            <div class="chart-container min-w-0">
-              <canvas id="chart-incibe"></canvas>
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 min-w-0">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Gravedad</h2>
-              <span class="text-[11px] text-slate-400">Triaje</span>
-            </div>
-            <div class="chart-container flex items-center justify-center min-w-0">
-              <canvas id="chart-severity"></canvas>
-            </div>
+          <!-- TARJETAS ADAPTATIVAS (MÓVIL) -->
+          <div id="cards-dashboard-alerts" class="block md:hidden space-y-2.5 max-h-[550px] overflow-y-auto min-w-0">
+            <!-- Inyección JS -->
           </div>
         </div>
 
@@ -1174,7 +1252,111 @@ def main():
   <!-- =========================================================================
        MODAL DE DETALLE Y GESTIÓN DE INCIDENTE
        ========================================================================= -->
-  <div id="incident-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <!-- =========================================================================
+       MODAL DE GESTIÓN Y CONTENCIÓN DE ALERTA
+       ========================================================================= -->
+  <div id="alert-manage-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-4 p-5 min-w-0">
+      
+      <!-- CABECERA MODAL -->
+      <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="modal-manage-id" class="font-mono text-sm font-bold text-[#0784B7] dark:text-[#38BDF8]">SOC-20261103-...</span>
+            <span id="modal-manage-sev" class="badge-critical">CRITICA</span>
+            <span class="text-[11px] text-slate-400 font-mono" id="modal-manage-timestamp">2026-11-03 18:05</span>
+          </div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white mt-1">Gestión Pericial y Triaje de Alerta</h2>
+        </div>
+        <button onclick="closeAlertManageModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- METADATOS TÉCNICOS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Clase INCIBE</div>
+          <div id="modal-manage-class" class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Subclase INCIBE</div>
+          <div id="modal-manage-subclass" class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Usuario / Cuenta</div>
+          <div id="modal-manage-user" class="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Host / Equipo</div>
+          <div id="modal-manage-host" class="font-semibold text-[#0784B7] dark:text-[#38BDF8] mt-0.5 truncate">-</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 text-xs">
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Dirección IP</div>
+          <div id="modal-manage-ip" class="font-mono text-slate-700 dark:text-slate-300 mt-0.5 truncate">-</div>
+        </div>
+        <div class="p-2.5 rounded bg-slate-50 dark:bg-slate-800/60">
+          <div class="text-[10px] text-slate-400 font-medium">Sede / Ubicación</div>
+          <div id="modal-manage-site" class="font-semibold text-slate-700 dark:text-slate-300 mt-0.5 truncate">-</div>
+        </div>
+      </div>
+
+      <!-- DESCRIPCIÓN FORENSE DEL SENSOR -->
+      <div class="space-y-1 text-xs">
+        <strong class="text-slate-700 dark:text-slate-300 font-semibold">Telemetría y Evidencia Capturada</strong>
+        <p id="modal-manage-desc" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-mono text-[11px] leading-relaxed break-words"></p>
+      </div>
+
+      <!-- ACCIÓN DE RESPUESTA SOAR INMEDIATA -->
+      <div class="p-3.5 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/60 space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+            <span>Protocolo de Contención SOAR (Mitigación Automática)</span>
+          </div>
+          <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Directriz 1 Activa</span>
+        </div>
+        <p class="text-[11px] text-slate-600 dark:text-slate-300">
+          Ejecuta regla de aislamiento en Firewall perimetral, corte de interfaz de red en EDR y revocación de tokens OAuth para el objetivo afectado.
+        </p>
+        <button id="btn-modal-soar-contain" onclick="executeAlertSoarAction()" class="btn-sampol-primary text-xs bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Ejecutar Contención SOAR (Aislar / Bloquear)</span>
+        </button>
+      </div>
+
+      <!-- ACTUALIZACIÓN DE ESTADO OPERATIVO -->
+      <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="font-semibold text-slate-700 dark:text-slate-300">Estado de la Alerta:</span>
+          <span class="text-slate-400 text-[11px] ml-1">Actualice la fase de triaje</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="modal-manage-status-select" class="px-2.5 py-1 text-xs rounded bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+            <option value="Pendiente">Pendiente de Revisión</option>
+            <option value="En Investigación">En Investigación</option>
+            <option value="Contenida SOAR">Contenida SOAR</option>
+            <option value="Falso Positivo">Falso Positivo</option>
+            <option value="Cerrada">Cerrada</option>
+          </select>
+          <button onclick="saveAlertStatusChange()" class="btn-sampol-secondary text-xs py-1 px-3">Guardar</button>
+        </div>
+      </div>
+
+      <!-- BOTONES DE PIE -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2 text-xs">
+        <button onclick="closeAlertManageModal()" class="btn-sampol-secondary text-xs">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+<div id="incident-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-4 p-5 min-w-0">
       
       <!-- CABECERA MODAL -->
@@ -1698,6 +1880,7 @@ def main():
       }});
       renderIncidentsTable();
       renderDashboardPriorityIncidents();
+      renderDashboardAlertsTable();
       renderNotifsTable();
       openIncidentModal(CURRENT_MODAL_INC_ID);
     }}
@@ -1976,6 +2159,58 @@ def main():
         `).join('');
       }}
 
+      const chDashSev = document.getElementById('chart-dashboard-severity');
+      if (chDashSev && typeof Chart !== 'undefined') {{
+        new Chart(chDashSev, {{
+          type: 'bar',
+          data: {{
+            labels: ['Crítica (P1)', 'Alta (P2)', 'Media (P3)', 'Baja (P4)'],
+            datasets: [{{
+              label: 'Cantidad de Alertas',
+              data: [{crit_alerts}, {high_alerts}, {med_alerts}, {low_alerts}],
+              backgroundColor: ['#DC2626', '#EA580C', '#D97706', '#16A34A'],
+              borderRadius: 6,
+              borderWidth: 0,
+              barThickness: 42
+            }}]
+          }},
+          options: {{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {{
+              legend: {{ display: false }},
+              tooltip: {{
+                callbacks: {{
+                  label: function(ctx) {{
+                    const total = {total_alerts};
+                    const pct = ((ctx.raw / total) * 100).toFixed(1);
+                    return ' ' + ctx.raw + ' alertas (' + pct + '%)';
+                  }}
+                }}
+              }}
+            }},
+            scales: {{
+              x: {{
+                grid: {{ display: false }},
+                ticks: {{
+                  font: {{ size: 11, weight: '600' }},
+                  color: '#64748B'
+                }}
+              }},
+              y: {{
+                beginAtZero: true,
+                grid: {{ color: 'rgba(226, 232, 240, 0.6)' }},
+                ticks: {{
+                  font: {{ size: 11 }},
+                  color: '#64748B',
+                  stepSize: 10
+                }}
+              }}
+            }}
+          }}
+        }});
+      }}
+
       const chIncibe = document.getElementById('chart-incibe');
       if (chIncibe && typeof Chart !== 'undefined') {{
         new Chart(chIncibe, {{
@@ -2029,6 +2264,221 @@ def main():
         lucide.createIcons();
       }}
     }});
+
+    let DASH_CURRENT_SEVERITY = 'all';
+    let DASH_ALERT_STORE = (ALERTS_DATA || []).map(function(a, idx) {{
+      return Object.assign({{}}, a, {{
+        status: a.status || (a.severity === 'CRITICA' ? 'En Investigación' : 'Pendiente'),
+        idx: idx
+      }});
+    }});
+
+    function renderDashboardAlertsTable() {{
+      const searchInput = document.getElementById('dash-alert-search');
+      const q = (searchInput ? searchInput.value : '').toLowerCase();
+      const tb = document.getElementById('tbl-dashboard-alerts');
+      const cards = document.getElementById('cards-dashboard-alerts');
+      const countEl = document.getElementById('dash-filtered-count');
+      if (!tb) return;
+
+      const filtered = DASH_ALERT_STORE.filter(function(a) {{
+        const matchSev = DASH_CURRENT_SEVERITY === 'all' || a.severity === DASH_CURRENT_SEVERITY;
+        const matchQ = !q || 
+          (a.internal_id && a.internal_id.toLowerCase().indexOf(q) !== -1) ||
+          (a.user && a.user.toLowerCase().indexOf(q) !== -1) ||
+          (a.host && a.host.toLowerCase().indexOf(q) !== -1) ||
+          (a.ip && a.ip.toLowerCase().indexOf(q) !== -1) ||
+          (a.class && a.class.toLowerCase().indexOf(q) !== -1) ||
+          (a.subclass && a.subclass.toLowerCase().indexOf(q) !== -1) ||
+          (a.desc && a.desc.toLowerCase().indexOf(q) !== -1);
+        return matchSev && matchQ;
+      }});
+
+      if (countEl) {{
+        countEl.textContent = 'Mostrando ' + filtered.length + ' de ' + DASH_ALERT_STORE.length + ' alertas';
+      }}
+
+      if (filtered.length === 0) {{
+        tb.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400 text-xs">No se encontraron alertas para los filtros seleccionados.</td></tr>';
+        if (cards) cards.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">No se encontraron alertas.</div>';
+        return;
+      }}
+
+      tb.innerHTML = filtered.map(function(a) {{
+        const badgeClass = a.severity === 'CRITICA' ? 'badge-critical' : 
+                           a.severity === 'ALTA' ? 'badge-high' : 
+                           a.severity === 'MEDIA' ? 'badge-medium' : 'badge-low';
+        
+        let statusBadge = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Pendiente</span>';
+        if (a.status === 'Contenida SOAR') {{
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"><i data-lucide="check" class="w-3 h-3"></i> Contenido</span>';
+        }} else if (a.status === 'En Investigación') {{
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">En Investigación</span>';
+        }}
+
+        const entity = a.user && a.user !== 'No identificado' 
+          ? a.user 
+          : (a.host && a.host !== 'No identificado' 
+          ? a.host 
+          : (a.ip && a.ip !== 'N/A' ? a.ip : 'Sensor Global'));
+
+        const ipSite = a.ip && a.ip !== 'N/A' ? 'IP: ' + a.ip : (a.site || 'Palma');
+        const timestampStr = (a.timestamp || '').substring(0, 16);
+
+        return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">' +
+          '<td class="font-mono text-[#0784B7] dark:text-[#38BDF8] font-bold text-xs whitespace-nowrap">' + a.internal_id + '</td>' +
+          '<td class="font-mono text-[11px] text-slate-400 whitespace-nowrap">' + timestampStr + '</td>' +
+          '<td><span class="' + badgeClass + '">' + a.severity + '</span></td>' +
+          '<td>' +
+            '<div class="font-semibold text-slate-800 dark:text-slate-200 text-xs">' + a.class + '</div>' +
+            '<div class="text-[10px] text-slate-400 truncate max-w-[180px]">' + (a.subclass || '') + '</div>' +
+          '</td>' +
+          '<td>' +
+            '<div class="font-mono text-xs text-slate-700 dark:text-slate-300 truncate max-w-[170px]">' + entity + '</div>' +
+            '<div class="text-[10px] text-slate-400 font-mono">' + ipSite + '</div>' +
+          '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td class="text-right whitespace-nowrap">' +
+            '<button data-id="' + a.internal_id + '" onclick="openAlertManageModal(this.dataset.id)" class="px-2.5 py-1 rounded bg-[#0784B7]/10 hover:bg-[#0784B7] text-[#0784B7] hover:text-white dark:bg-[#38BDF8]/10 dark:hover:bg-[#38BDF8] dark:text-[#38BDF8] dark:hover:text-slate-900 font-semibold text-xs transition inline-flex items-center gap-1.5">' +
+              '<i data-lucide="sliders" class="w-3.5 h-3.5"></i>' +
+              '<span>Gestionar</span>' +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+      }}).join('');
+
+      if (cards) {{
+        cards.innerHTML = filtered.map(function(a) {{
+          const badgeClass = a.severity === 'CRITICA' ? 'badge-critical' : 
+                             a.severity === 'ALTA' ? 'badge-high' : 
+                             a.severity === 'MEDIA' ? 'badge-medium' : 'badge-low';
+          const entity = a.user || a.host || a.ip || 'N/A';
+          const timestampStr = (a.timestamp || '').substring(0, 16);
+          const desc = a.desc || a.category || '';
+          const status = a.status || 'Pendiente';
+
+          return '<div class="mobile-card space-y-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs shadow-sm">' +
+            '<div class="flex items-center justify-between">' +
+              '<span class="font-mono font-bold text-xs text-[#0784B7] dark:text-[#38BDF8]">' + a.internal_id + '</span>' +
+              '<span class="' + badgeClass + '">' + a.severity + '</span>' +
+            '</div>' +
+            '<div class="font-semibold text-slate-800 dark:text-slate-200">' + a.class + (a.subclass ? ' · ' + a.subclass : '') + '</div>' +
+            '<div class="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap gap-2">' +
+              '<span><strong>Afectado:</strong> ' + entity + '</span>' +
+              '<span><strong>Fecha:</strong> ' + timestampStr + '</span>' +
+            '</div>' +
+            '<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2">' + desc + '</p>' +
+            '<div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">' +
+              '<span class="text-[10px] text-slate-400">' + status + '</span>' +
+              '<button data-id="' + a.internal_id + '" onclick="openAlertManageModal(this.dataset.id)" class="px-2.5 py-1 rounded bg-[#0784B7] text-white font-medium text-xs flex items-center gap-1">' +
+                '<i data-lucide="sliders" class="w-3.5 h-3.5"></i>' +
+                '<span>Gestionar</span>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }}).join('');
+      }}
+
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function filterDashboardAlertsTable() {{
+      renderDashboardAlertsTable();
+    }}
+
+    function filterDashboardBySeverity(sev) {{
+      DASH_CURRENT_SEVERITY = sev;
+      ['all', 'CRITICA', 'ALTA', 'MEDIA', 'BAJA'].forEach(function(s) {{
+        const btn = document.getElementById('dash-filter-' + s);
+        if (btn) {{
+          if (s === sev) {{
+            btn.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-[#0784B7] text-white shadow-sm';
+          }} else {{
+            const txtColor = s === 'CRITICA' ? 'text-rose-600' : s === 'ALTA' ? 'text-orange-600' : s === 'MEDIA' ? 'text-amber-600' : s === 'BAJA' ? 'text-emerald-600' : 'text-slate-700 dark:text-slate-300';
+            btn.className = 'px-3 py-1 rounded-md text-xs font-medium bg-white dark:bg-slate-800 ' + txtColor + ' border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50';
+          }}
+        }}
+      }});
+      renderDashboardAlertsTable();
+      const el = document.getElementById('dash-alert-search');
+      if (el) el.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+    }}
+
+    let CURRENT_MANAGE_ALERT = null;
+
+    function openAlertManageModal(id) {{
+      const alertObj = DASH_ALERT_STORE.find(function(a) {{ return a.internal_id === id; }});
+      if (!alertObj) return;
+      CURRENT_MANAGE_ALERT = alertObj;
+
+      document.getElementById('modal-manage-id').textContent = alertObj.internal_id;
+      const sevEl = document.getElementById('modal-manage-sev');
+      sevEl.textContent = alertObj.severity;
+      sevEl.className = alertObj.severity === 'CRITICA' ? 'badge-critical' : alertObj.severity === 'ALTA' ? 'badge-high' : alertObj.severity === 'MEDIA' ? 'badge-medium' : 'badge-low';
+      
+      document.getElementById('modal-manage-timestamp').textContent = (alertObj.timestamp || '').substring(0, 19);
+      document.getElementById('modal-manage-class').textContent = alertObj.class;
+      document.getElementById('modal-manage-subclass').textContent = alertObj.subclass || 'Sin subclase especificada';
+      document.getElementById('modal-manage-user').textContent = alertObj.user && alertObj.user !== 'No identificado' ? alertObj.user : 'No especificado';
+      document.getElementById('modal-manage-host').textContent = alertObj.host && alertObj.host !== 'No identificado' ? alertObj.host : 'No especificado';
+      document.getElementById('modal-manage-ip').textContent = alertObj.ip && alertObj.ip !== 'N/A' ? alertObj.ip : 'Sin IP registrada';
+      document.getElementById('modal-manage-site').textContent = alertObj.site || 'SAMPOL HQ (Palma)';
+      document.getElementById('modal-manage-desc').textContent = alertObj.desc || alertObj.category || 'Sin descripción detallada.';
+      document.getElementById('modal-manage-status-select').value = alertObj.status || 'Pendiente';
+
+      const btnSoar = document.getElementById('btn-modal-soar-contain');
+      if (alertObj.status === 'Contenida SOAR') {{
+        btnSoar.disabled = true;
+        btnSoar.className = 'btn-sampol-secondary text-xs opacity-50 cursor-not-allowed';
+        btnSoar.innerHTML = '<i data-lucide="check-check" class="w-4 h-4"></i><span>Contención Ya Aplicada</span>';
+      }} else {{
+        btnSoar.disabled = false;
+        btnSoar.className = 'btn-sampol-primary text-xs bg-emerald-600 hover:bg-emerald-700 text-white';
+        btnSoar.innerHTML = '<i data-lucide="shield-check" class="w-4 h-4"></i><span>Ejecutar Contención SOAR (Aislar / Bloquear)</span>';
+      }}
+
+      document.getElementById('alert-manage-modal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }}
+
+    function closeAlertManageModal() {{
+      document.getElementById('alert-manage-modal').classList.add('hidden');
+      CURRENT_MANAGE_ALERT = null;
+    }}
+
+    function executeAlertSoarAction() {{
+      if (!CURRENT_MANAGE_ALERT) return;
+      CURRENT_MANAGE_ALERT.status = 'Contenida SOAR';
+      const target = CURRENT_MANAGE_ALERT.host || CURRENT_MANAGE_ALERT.user || CURRENT_MANAGE_ALERT.ip;
+      showToastNotification('Acción SOAR ejecutada: Activo ' + target + ' aislado preventivamente.');
+      renderDashboardAlertsTable();
+      openAlertManageModal(CURRENT_MANAGE_ALERT.internal_id);
+    }}
+
+    function saveAlertStatusChange() {{
+      if (!CURRENT_MANAGE_ALERT) return;
+      const newStatus = document.getElementById('modal-manage-status-select').value;
+      CURRENT_MANAGE_ALERT.status = newStatus;
+      showToastNotification('Estado de alerta ' + CURRENT_MANAGE_ALERT.internal_id + ' actualizado a: ' + newStatus);
+      renderDashboardAlertsTable();
+      closeAlertManageModal();
+    }}
+
+    function showToastNotification(msg) {{
+      let toast = document.getElementById('sampol-toast');
+      if (!toast) {{
+        toast = document.createElement('div');
+        toast.id = 'sampol-toast';
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-3 rounded-lg shadow-xl bg-slate-900 text-white text-xs flex items-center gap-2 border border-slate-700 transition-all duration-300';
+        document.body.appendChild(toast);
+      }}
+      toast.innerHTML = '<i data-lucide="info" class="w-4 h-4 text-[#38BDF8]"></i><span>' + msg + '</span>';
+      toast.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+      setTimeout(function() {{
+        toast.classList.add('hidden');
+      }}, 4000);
+    }}
 
     function filterAlerts() {{
       const q = (document.getElementById('alert-search').value || '').toLowerCase();
