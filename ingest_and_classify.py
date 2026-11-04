@@ -532,7 +532,7 @@ def main():
                     'Comunicación oficial del Director de TI / Organización del reto. Se registra para trazabilidad pero se excluye del cómputo de alertas del SOC.',
                     :semail, :title, :desc,
                     'cerrada', FALSE, TRUE
-                )
+                ) ON CONFLICT (alert_code) DO NOTHING
                 """,
                 acode=alert_code, reid=raw_email_id, ets=received_utc,
                 semail=sender_email, title=subject, desc=body_text[:600]
@@ -560,13 +560,14 @@ def main():
                     'Intento de intrusión',
                     'equipo_1_hackaton@sampol.com', 'Buzón Correo Corporativo', 'bankmenia.fr', :iocs, 'Acceso Inicial (Phishing)',
                     :title, :desc, 'nueva', TRUE, :fp
-                ) RETURNING id
+                ) ON CONFLICT (alert_code) DO NOTHING RETURNING id
                 """,
                 acode=alert_code, reid=raw_email_id, ets=received_utc, etz=orig_tz,
                 iocs=json.dumps(urls[:3]), title=f"[Correo Externo Sospechoso] {subject}",
                 desc=f"Remitente: {sender_email}. {body_text[:400]}", fp=f"EXT-{msg_id}"
             )
-            aid = res_al[0][0]
+            if res_al:
+                aid = res_al[0][0]
             conn.run(
                 """
                 INSERT INTO alert_audit_log (alert_id, changed_by, action_type, field_changed, old_value, new_value, reason)
@@ -814,7 +815,7 @@ def main():
                 :status, :issoc, :isnoise, FALSE,
                 :isdup, :pid, 1, :fp,
                 :pidet, :pievid
-            ) RETURNING id
+            ) ON CONFLICT (alert_code) DO NOTHING RETURNING id
             """,
             acode=soc_code,
             iid=int_alert_id,
@@ -851,7 +852,14 @@ def main():
             pidet=pi_detected,
             pievid=pi_evidence
         )
-        new_aid = res_alert[0][0]
+        if not res_alert:
+            res_exist = conn.run("SELECT id FROM alerts WHERE alert_code = :acode", acode=soc_code)
+            new_aid = res_exist[0][0] if res_exist else None
+        else:
+            new_aid = res_alert[0][0]
+
+        if not new_aid:
+            continue
         if internal_al_id and not is_duplicate:
             seen_alert_ids[internal_al_id] = new_aid
 
