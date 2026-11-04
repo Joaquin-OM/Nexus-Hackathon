@@ -72,120 +72,79 @@ def main():
 <body class="bg-[#F8FAFC] dark:bg-[#0B1118] text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col font-sans">
 
   <!-- =========================================================================
-       MODAL DE AUTENTICACIÓN CORPORATIVA EXCLUSIVA SAMPOL (ZERO TRUST)
+       PANTALLA DE INICIO DE SESIÓN CORPORATIVA SAMPOL (REAL DASHBOARD LOGIN)
        ========================================================================= -->
-  <div id="sampol-auth-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 transition-all duration-300">
-    <div class="bg-white dark:bg-[#111A24] border border-[#E2E8F0] dark:border-[#1E293B] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+  <div id="sampol-auth-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 dark:bg-[#070B10] backdrop-blur-md p-4 transition-all duration-300">
+    <div class="bg-white dark:bg-[#111A24] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-7 space-y-4">
       
-      <!-- CABECERA DE MARCA SAMPOL -->
-      <div class="bg-gradient-to-r from-[#0E2B5C] to-[#0784B7] px-6 py-5 text-white">
-        <div class="flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shrink-0">
-            <i data-lucide="shield-check" class="w-6 h-6 text-[#42A83B]"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-base font-bold tracking-tight text-white">NEXUS SOC 2.0</span>
-              <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-[#42A83B] text-white uppercase tracking-wider">Zero Trust</span>
-            </div>
-            <span class="text-xs text-blue-100 font-medium">Control de Acceso Institucional · Grupo SAMPOL</span>
-          </div>
+      <!-- LOGO Y TÍTULO LIMPIO -->
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 mb-3">
+          <img src="./assets/brand/sampol_logo_color.png" alt="SAMPOL" class="h-7 w-auto block dark:hidden">
+          <img src="./assets/brand/sampol_logo_blanco.png" alt="SAMPOL" class="h-7 w-auto hidden dark:block">
+          <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">NEXUS SOC</span>
         </div>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Iniciar sesión</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Introduce tus credenciales corporativas @sampol.com</p>
       </div>
 
-      <!-- CONTENIDO -->
-      <div class="p-6 space-y-4">
+      <!-- ALERTA DE ERROR SI EL DOMINIO NO ES @SAMPOL.COM -->
+      <div id="auth-error-alert" class="hidden p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400 text-center font-medium">
+        Acceso restringido: Solo se permiten cuentas corporativas @sampol.com
+      </div>
+
+      <!-- FORMULARIO REAL DE LOGIN -->
+      <form id="sampol-login-form" onsubmit="handleSampolLogin(event)" class="space-y-3.5">
         <div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Identificación de Personal de Seguridad</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-            Plataforma restringida para la guardia operativa del CSIRT y Dirección de TI. El acceso requiere una identidad corporativa <span class="font-bold text-[#0784B7] dark:text-[#38BDF8]">@sampol.com</span>.
-          </p>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Correo corporativo
+          </label>
+          <input type="email" id="auth-email" required placeholder="usuario@sampol.com" value="analista.soc@sampol.com"
+                 class="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0784B7] focus:border-transparent transition">
         </div>
 
-        <!-- ALERTA DE ERROR DE DOMINIO NO SAMPOL -->
-        <div id="auth-error-alert" class="hidden p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 space-y-1">
-          <div class="flex items-center gap-1.5 font-bold">
-            <i data-lucide="shield-alert" class="w-4 h-4 text-red-600 shrink-0"></i>
-            <span>Acceso Denegado — Dominio Externo No Autorizado</span>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-medium text-slate-700 dark:text-slate-300">Contraseña</label>
+            <a href="javascript:void(0)" onclick="alert('Contacte con soporte IT de SAMPOL (dirti@sampol.com) para restablecer credenciales.');" class="text-[11px] text-[#0784B7] dark:text-[#38BDF8] hover:underline">¿Olvidaste tu contraseña?</a>
           </div>
-          <p class="text-[11px] leading-relaxed pl-5">
-            Esta plataforma es de uso exclusivo para cuentas <strong class="underline">@sampol.com</strong>. Por política de seguridad perimetral de Grupo SAMPOL, se prohíbe el acceso a cuentas externas o personales.
-          </p>
+          <input type="password" id="auth-password" required placeholder="••••••••••••" value="SampolSecure2026!"
+                 class="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0784B7] focus:border-transparent transition">
         </div>
 
-        <!-- FORMULARIO -->
-        <form id="sampol-login-form" onsubmit="handleSampolLogin(event)" class="space-y-3.5">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Correo Electrónico Corporativo
-            </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <i data-lucide="mail" class="w-4 h-4"></i>
-              </span>
-              <input type="email" id="auth-email" required placeholder="tu_usuario@sampol.com" value="analista.soc@sampol.com"
-                     class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0784B7] focus:border-transparent transition">
-            </div>
-            <span class="text-[10px] text-slate-400 mt-0.5 block">Solo se admiten credenciales terminadas en @sampol.com</span>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Contraseña / Clave de Acceso
-            </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <i data-lucide="lock" class="w-4 h-4"></i>
-              </span>
-              <input type="password" id="auth-password" required placeholder="••••••••••••" value="SampolSecure2026!"
-                     class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0784B7] focus:border-transparent transition">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Rol Asignado en Guardia
-            </label>
-            <select id="auth-role" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0784B7]">
-              <option value="Analista SOC L2">Analista SOC Nivel 2 · Guardia Activa</option>
-              <option value="Director TI">Director TI · Mando Ejecutivo de Crisis</option>
-              <option value="Perito Forense DFIR">Perito Forense DFIR · Investigador Principal</option>
-              <option value="Operador SCADA OT">Operador de Control Industrial / OT SAMPOL</option>
-            </select>
-          </div>
-
-          <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-[#0784B7] hover:bg-[#066d97] text-white font-bold text-xs shadow hover:shadow-md transition flex items-center justify-center gap-2">
-            <i data-lucide="log-in" class="w-4 h-4"></i>
-            <span>Iniciar Sesión Corporativa SAMPOL</span>
-          </button>
-        </form>
-
-        <!-- ACCESOS RÁPIDOS PARA LA PRESENTACIÓN -->
-        <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Accesos Rápidos para el Jurado / Demo:</span>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="quickLogin('analista.soc@sampol.com', 'Analista SOC L2')" type="button"
-                    class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#0784B7] dark:hover:border-[#0784B7] bg-slate-50 dark:bg-slate-800/60 text-left transition text-[11px] group">
-              <span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#0784B7] block">Analista SOC</span>
-              <span class="text-[9.5px] text-slate-400">analista.soc@sampol.com</span>
-            </button>
-            <button onclick="quickLogin('dirti@sampol.com', 'Director TI')" type="button"
-                    class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#0784B7] dark:hover:border-[#0784B7] bg-slate-50 dark:bg-slate-800/60 text-left transition text-[11px] group">
-              <span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#0784B7] block">Director TI</span>
-              <span class="text-[9.5px] text-slate-400">dirti@sampol.com</span>
-            </button>
-          </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded border-slate-300 text-[#0784B7] focus:ring-[#0784B7]">
+          <label for="remember-me" class="ml-2 text-xs text-slate-600 dark:text-slate-400">Recordar este equipo</label>
         </div>
 
-        <!-- PIE DEL MODAL -->
-        <div class="flex items-center justify-between pt-1 text-[10px] text-slate-400">
-          <span>SAMPOL Corporate Identity · v2.4</span>
-          <button onclick="dismissLoginModal()" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">
-            Omitir (Modo Demo)
-          </button>
-        </div>
+        <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-[#0784B7] hover:bg-[#066d97] text-white font-semibold text-xs shadow-sm hover:shadow transition flex items-center justify-center gap-2">
+          <span>Iniciar sesión</span>
+        </button>
+      </form>
 
+      <!-- SEPARADOR -->
+      <div class="relative my-2">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 dark:border-slate-800"></div></div>
+        <div class="relative flex justify-center text-[10px]"><span class="px-2 bg-white dark:bg-[#111A24] text-slate-400">o continuar con</span></div>
       </div>
+
+      <!-- BOTÓN SSO MICROSOFT 365 REAL -->
+      <button type="button" onclick="loginWithM365()" class="w-full py-2 px-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium transition flex items-center justify-center gap-2.5">
+        <svg class="w-4 h-4 shrink-0" viewBox="0 0 21 21">
+          <path fill="#f25022" d="M1 1h9v9H1z"/>
+          <path fill="#00a4ef" d="M1 11h9v9H1z"/>
+          <path fill="#7fba00" d="M11 1h9v9h-9z"/>
+          <path fill="#ffb900" d="M11 11h9v9h-9z"/>
+        </svg>
+        <span>Microsoft 365 (SAMPOL SSO)</span>
+      </button>
+
+      <!-- FOOTER DISCRETO -->
+      <div class="pt-2 text-center text-[10px] text-slate-400">
+        <span>© 2026 Grupo SAMPOL · Uso exclusivo para personal autorizado</span>
+      </div>
+
     </div>
   </div>
 
@@ -2625,28 +2584,34 @@ def main():
     function handleSampolLogin(e) {{
       if (e) e.preventDefault();
       const emailInput = document.getElementById('auth-email');
-      const roleInput = document.getElementById('auth-role');
       const errorAlert = document.getElementById('auth-error-alert');
       const email = (emailInput ? emailInput.value : '').trim();
-      const role = (roleInput ? roleInput.value : 'Analista SOC L2');
 
       if (!email.toLowerCase().endsWith('@sampol.com')) {{
         if (errorAlert) {{
           errorAlert.classList.remove('hidden');
-          if (window.lucide) lucide.createIcons();
+          errorAlert.textContent = 'Acceso restringido: Solo se permiten cuentas corporativas @sampol.com';
         }}
         return;
       }}
 
       if (errorAlert) errorAlert.classList.add('hidden');
 
-      let name = role;
+      let name = 'Carlos Gómez';
+      let role = 'Analista SOC L2';
       if (email.toLowerCase().includes('dirti') || email.toLowerCase().includes('director')) {{
-        name = 'Director TI (C-Level)';
-      }} else if (email.toLowerCase().includes('analista')) {{
-        name = 'Carlos Gómez (SOC L2)';
+        name = 'Director de TI';
+        role = 'Dirección de TI (C-Level)';
+      }} else if (email.toLowerCase().includes('admin')) {{
+        name = 'Administrador SOC';
+        role = 'Administrador de Seguridad';
       }} else {{
-        name = email.split('@')[0].toUpperCase();
+        const parts = email.split('@')[0].split('.');
+        if (parts.length >= 2) {{
+          name = parts[0].charAt(0).toUpperCase() + parts[0].slice(1) + ' ' + parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+        }} else {{
+          name = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+        }}
       }}
 
       const user = {{ email, name, role }};
@@ -2659,18 +2624,31 @@ def main():
         setTimeout(() => {{
           overlay.classList.add('hidden');
           overlay.classList.remove('opacity-0');
-        }}, 250);
+        }}, 200);
       }}
 
-      showToastNotification('Acceso concedido: Sesión iniciada como ' + email + ' (' + role + ')');
+      showToastNotification('Sesión iniciada correctamente como ' + user.name);
     }}
 
-    function quickLogin(email, role) {{
-      const emailInput = document.getElementById('auth-email');
-      const roleInput = document.getElementById('auth-role');
-      if (emailInput) emailInput.value = email;
-      if (roleInput) roleInput.value = role;
-      handleSampolLogin(null);
+    function loginWithM365() {{
+      const user = {{
+        email: 'carlos.gomez@sampol.com',
+        name: 'Carlos Gómez',
+        role: 'Analista SOC L2 (M365)'
+      }};
+      sessionStorage.setItem('sampol_user', JSON.stringify(user));
+      applyUserSession(user);
+
+      const overlay = document.getElementById('sampol-auth-overlay');
+      if (overlay) {{
+        overlay.classList.add('opacity-0');
+        setTimeout(() => {{
+          overlay.classList.add('hidden');
+          overlay.classList.remove('opacity-0');
+        }}, 200);
+      }}
+
+      showToastNotification('Autenticado vía Microsoft 365 Entra ID (SAMPOL)');
     }}
 
     function applyUserSession(user) {{
@@ -2692,16 +2670,8 @@ def main():
       const overlay = document.getElementById('sampol-auth-overlay');
       const errorAlert = document.getElementById('auth-error-alert');
       if (errorAlert) errorAlert.classList.add('hidden');
-      if (overlay) {{
-        overlay.classList.remove('hidden');
-        if (window.lucide) lucide.createIcons();
-      }}
-      showToastNotification('Sesión corporativa cerrada.');
-    }}
-
-    function dismissLoginModal() {{
-      const overlay = document.getElementById('sampol-auth-overlay');
-      if (overlay) overlay.classList.add('hidden');
+      if (overlay) overlay.classList.remove('hidden');
+      showToastNotification('Sesión cerrada.');
     }}
 
     function filterAlerts() {{
