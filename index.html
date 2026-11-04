@@ -138,85 +138,37 @@
       </button>
     </div>
 
-    <!-- NAVEGACIÓN AGRUPADA POR JERARQUÍA OPERATIVA -->
-    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-4 text-xs">
-      
-      <!-- BLOQUE 1: OPERACIONES -->
-      <div>
-        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Operaciones</div>
-        <div class="space-y-0.5">
-          <button onclick="switchTab('tab-resumen')" id="btn-tab-resumen" class="sidebar-nav-item w-full text-left active">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-            <span class="flex-1">Dashboard</span>
-          </button>
-          <button onclick="switchTab('tab-incidentes')" id="btn-tab-incidentes" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="siren" class="w-4 h-4"></i>
-            <span class="flex-1">Incidentes</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900">8 P1</span>
-          </button>
-          <button onclick="switchTab('tab-dataset')" id="btn-tab-dataset" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-            <span class="flex-1">Alertas</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">215</span>
-          </button>
-          <button onclick="switchTab('tab-forense')" id="btn-tab-forense" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="network" class="w-4 h-4"></i>
-            <span class="flex-1">Investigación</span>
-          </button>
-          <button onclick="switchTab('tab-notifications')" id="btn-tab-notifications" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span class="flex-1">Notificaciones</span>
-          </button>
-        </div>
-      </div>
+    <!-- NAVEGACIÓN OPERATIVA DEL SOC DASHBOARD -->
+    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-1.5 text-xs">
+      <div class="px-2 mb-2 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Centro de Operaciones</div>
 
-      <!-- BLOQUE 2: INFRAESTRUCTURA -->
-      <div>
-        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Infraestructura</div>
-        <div class="space-y-0.5">
-          <button onclick="switchTab('tab-activos')" id="btn-tab-activos" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="server" class="w-4 h-4"></i>
-            <span class="flex-1">Activos</span>
-          </button>
-          <button onclick="switchTab('tab-usuarios')" id="btn-tab-usuarios" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="users" class="w-4 h-4"></i>
-            <span class="flex-1">Usuarios</span>
-          </button>
-          <button onclick="switchTab('tab-soar')" id="btn-tab-soar" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="shield-check" class="w-4 h-4"></i>
-            <span class="flex-1">Respuesta</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">80</span>
-          </button>
-          <button onclick="switchTab('tab-automations')" id="btn-tab-automations" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="workflow" class="w-4 h-4"></i>
-            <span class="flex-1">Automatizaciones</span>
-          </button>
-        </div>
-      </div>
+      <button onclick="switchTab('tab-resumen')" id="btn-tab-resumen" class="sidebar-nav-item w-full text-left active">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span class="flex-1">Dashboard</span>
+      </button>
 
-      <!-- BLOQUE 3: ANÁLISIS Y CONTROL -->
-      <div>
-        <div class="px-2 mb-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Análisis y Control</div>
-        <div class="space-y-0.5">
-          <button onclick="switchTab('tab-informes')" id="btn-tab-informes" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="file-text" class="w-4 h-4"></i>
-            <span class="flex-1">Informes</span>
-          </button>
-          <button onclick="switchTab('tab-roi')" id="btn-tab-roi" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="chart-line" class="w-4 h-4"></i>
-            <span class="flex-1">Finanzas</span>
-          </button>
-          <button onclick="switchTab('tab-auditoria')" id="btn-tab-auditoria" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-            <span class="flex-1">Auditoría</span>
-          </button>
-          <button onclick="switchTab('tab-configuracion')" id="btn-tab-configuracion" class="sidebar-nav-item w-full text-left">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            <span class="flex-1">Configuración</span>
-          </button>
-        </div>
-      </div>
+      <button onclick="switchTab('tab-incidentes')" id="btn-tab-incidentes" class="sidebar-nav-item w-full text-left">
+        <i data-lucide="siren" class="w-4 h-4"></i>
+        <span class="flex-1">Incidentes</span>
+        <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900">8 P1</span>
+      </button>
 
+      <button onclick="switchTab('tab-dataset')" id="btn-tab-dataset" class="sidebar-nav-item w-full text-left">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+        <span class="flex-1">Alertas</span>
+        <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">215</span>
+      </button>
+
+      <button onclick="switchTab('tab-forense')" id="btn-tab-forense" class="sidebar-nav-item w-full text-left">
+        <i data-lucide="network" class="w-4 h-4"></i>
+        <span class="flex-1">Investigación</span>
+      </button>
+
+      <button onclick="switchTab('tab-soar')" id="btn-tab-soar" class="sidebar-nav-item w-full text-left">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        <span class="flex-1">Respuesta SOAR</span>
+        <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">80</span>
+      </button>
     </div>
 
     <!-- PIE DEL SIDEBAR: ESTADO SENSOR -->
@@ -397,7 +349,7 @@
             <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Aislamientos ejecutados</div>
           </div>
 
-          <div onclick="switchTab('tab-roi')" class="sampol-card p-3.5 cursor-pointer hover:border-[#0784B7] transition border-l-4 border-l-[#0784B7]">
+          <div onclick="switchTab('tab-soar')" class="sampol-card p-3.5 cursor-pointer hover:border-[#0784B7] transition border-l-4 border-l-[#0784B7]">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-semibold text-[#0784B7] dark:text-[#38BDF8]">Reducción Ruido</span>
               <i data-lucide="sparkles" class="w-4 h-4 text-[#0784B7]"></i>
@@ -1095,208 +1047,6 @@
 
       </section>
 
-      <!-- =====================================================================
-           TAB 10: INFORMES & COMPLIANCE NIS2
-           ===================================================================== -->
-      <section id="tab-informes" class="tab-content hidden min-w-0 w-full space-y-4">
-
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Informes</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Generación y consulta de expedientes de ciberseguridad y pre-notificaciones NIS2.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs min-w-0 w-full">
-          <div class="sampol-card p-4 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-900 dark:text-white">Pre-notificación NIS2</span>
-              <span class="badge-low">24h Cumplida</span>
-            </div>
-            <p class="text-slate-500 text-[11px]">Plantilla oficial remitida a INCIBE-CERT bajo el Artículo 23 de la Directiva Europea NIS2.</p>
-            <div class="pt-2">
-              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">PRENOTIFICACION_INCIDENTE_NIS2.docx</span>
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-900 dark:text-white">Informe Forense Kill Chain</span>
-              <span class="badge-low">Pericial</span>
-            </div>
-            <p class="text-slate-500 text-[11px]">Reconstrucción cronológica de accesos, paciente cero y contención de C2.</p>
-            <div class="pt-2">
-              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">INFORME_FORENSE_KILL_CHAIN.docx</span>
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-900 dark:text-white">Memoria de Industrialización</span>
-              <span class="badge-low">Aprobada</span>
-            </div>
-            <p class="text-slate-500 text-[11px]">Plan estratégico de pase a producción de NEXUS SOC 2.0 para Grupo SAMPOL.</p>
-            <div class="pt-2">
-              <span class="text-[#0784B7] dark:text-[#38BDF8] font-semibold text-[11px]">PLAN_INDUSTRIALIZACION_NEXUS.docx</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- =====================================================================
-           TAB 11: FINANZAS (CALCULADORA DE RETORNO Y ROI DEL DIRECTOR)
-           ===================================================================== -->
-      <section id="tab-roi" class="tab-content hidden min-w-0 w-full space-y-4">
-
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finanzas</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Retorno de inversión, ahorro operativo y comparativa económica (Directorio TI).</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0 w-full">
-
-          <div class="sampol-card p-4 space-y-4">
-            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">1. Triaje de Alertas</div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Volumen mensual:</span>
-                <span id="lbl-vol" class="font-semibold text-[#0784B7]">3.000</span>
-              </div>
-              <input type="range" id="slider-vol" min="500" max="10000" step="100" value="3000" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Revisión manual:</span>
-                <span id="lbl-tman" class="font-semibold text-[#0784B7]">12 min</span>
-              </div>
-              <input type="range" id="slider-tman" min="2" max="30" step="1" value="12" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Coste analista SOC:</span>
-                <span id="lbl-cost" class="font-semibold text-[#0784B7]">45 €/h</span>
-              </div>
-              <input type="range" id="slider-cost" min="25" max="80" step="1" value="45" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 space-y-4">
-            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">2. Bloqueo y Desarrollo</div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Bloqueos al mes:</span>
-                <span id="lbl-bloq" class="font-semibold text-[#0784B7]">120</span>
-              </div>
-              <input type="range" id="slider-bloq" min="10" max="500" step="10" value="120" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Tiempo por bloqueo:</span>
-                <span id="lbl-tbloq" class="font-semibold text-[#0784B7]">25 min</span>
-              </div>
-              <input type="range" id="slider-tbloq" min="5" max="60" step="5" value="25" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-600 dark:text-slate-400">Coste dev interno:</span>
-                <span id="lbl-cdev" class="font-semibold text-[#0784B7]">50 €/h</span>
-              </div>
-              <input type="range" id="slider-cdev" min="30" max="100" step="5" value="50" oninput="calcROI()" class="w-full accent-[#0784B7]">
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 flex flex-col justify-between">
-            <div>
-              <div class="text-[11px] font-semibold text-slate-400 uppercase">Ahorro Operativo Anual</div>
-              <div id="res-ahorro-neto" class="text-3xl font-bold text-[#42A83B] mt-1">184.500 €</div>
-              <p class="text-xs text-slate-500 mt-1">Frente al modelo manual AS-IS.</p>
-            </div>
-
-            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
-              <div>
-                <span class="text-slate-400">Payback:</span>
-                <span id="res-payback" class="font-bold text-slate-900 dark:text-white ml-1">42 días (1,4 meses)</span>
-              </div>
-              <div>
-                <span class="text-slate-400">Retorno (ROI):</span>
-                <span id="res-roi" class="font-bold text-[#0784B7] ml-1">823 %</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- =====================================================================
-           TAB 12: AUDITORÍA
-           ===================================================================== -->
-      <section id="tab-auditoria" class="tab-content hidden min-w-0 w-full space-y-4">
-
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Auditoría</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Trazabilidad inmutable de eventos conforme a NIS2 y ENS.</p>
-        </div>
-
-        <div class="sampol-card p-4 space-y-2 text-xs font-mono">
-          <div class="text-slate-600 dark:text-slate-400">[2026-11-03 20:20:01 UTC] <strong class="text-emerald-600">AUDIT_OK</strong>: Sincronización 142 correos. Hash SHA-256 verificado.</div>
-          <div class="text-slate-600 dark:text-slate-400">[2026-11-03 19:06:35 UTC] <strong class="text-purple-600">SOAR_DISPATCH</strong>: Orden autónoma #63 sobre dmoreno@sampol.com ejecutada.</div>
-          <div class="text-slate-600 dark:text-slate-400">[2026-11-03 18:00:00 UTC] <strong class="text-[#0784B7]">POLICY_ACTIVE</strong>: Directriz 1 (TI) activada en toda la infraestructura.</div>
-        </div>
-
-      </section>
-
-      <!-- =====================================================================
-           TAB 13: CONFIGURACIÓN
-           ===================================================================== -->
-      <section id="tab-configuracion" class="tab-content hidden min-w-0 w-full space-y-4">
-
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Configuración</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Parámetros operativos, umbrales de SLA y reglas de Lista Blanca.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs min-w-0 w-full">
-          <div class="sampol-card p-4 space-y-3">
-            <div class="font-semibold text-slate-800 dark:text-slate-200">Umbrales de SLA y Cooldown</div>
-            <div class="space-y-2">
-              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
-                <span class="text-slate-600 dark:text-slate-400">SLA Incidentes Críticos (P1):</span>
-                <span class="font-semibold text-rose-600">15 minutos</span>
-              </div>
-              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
-                <span class="text-slate-600 dark:text-slate-400">SLA Incidentes Altos (P2):</span>
-                <span class="font-semibold text-amber-600">60 minutos</span>
-              </div>
-              <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
-                <span class="text-slate-600 dark:text-slate-400">Ventana de Cooldown Anti-Fatiga:</span>
-                <span class="font-semibold text-[#0784B7]">15 minutos</span>
-              </div>
-              <div class="flex justify-between items-center py-1">
-                <span class="text-slate-600 dark:text-slate-400">Frecuencia Sondeo Graph API:</span>
-                <span class="font-semibold text-emerald-600">45 segundos</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="sampol-card p-4 space-y-3">
-            <div class="font-semibold text-slate-800 dark:text-slate-200">Salvaguardas de Lista Blanca (Directriz 1)</div>
-            <p class="text-slate-500 text-[11px]">Entidades permanentemente exentas de auto-bloqueo para evitar disrupción de servicios críticos.</p>
-            <div class="space-y-1.5 font-mono text-[11px]">
-              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ director.ti@sampol.com (VIP_DIRECCION)</div>
-              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ equipo_1_hackaton@sampol.com (BUZON_SOC)</div>
-              <div class="p-1.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">✓ 192.168.10.0/24 (RED_PLANTA_OT)</div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
     </main>
 
   </div>
@@ -1516,15 +1266,7 @@
       'tab-incidentes': 'Incidentes',
       'tab-dataset': 'Alertas',
       'tab-forense': 'Investigación',
-      'tab-notifications': 'Notificaciones',
-      'tab-activos': 'Activos',
-      'tab-usuarios': 'Usuarios',
-      'tab-soar': 'Respuesta',
-      'tab-automations': 'Automatizaciones',
-      'tab-informes': 'Informes',
-      'tab-roi': 'Finanzas',
-      'tab-auditoria': 'Auditoría',
-      'tab-configuracion': 'Configuración'
+      'tab-soar': 'Respuesta SOAR'
     };
 
     function switchTab(tabId) {
